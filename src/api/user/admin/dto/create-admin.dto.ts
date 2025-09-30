@@ -34,5 +34,5 @@ export class CreateAdminDto {
   })
   @IsNotEmpty()
   @IsPhoneNumber('UZ') // 'UZ' kodi bilan Uzbekistan telefon raqamlarini tekshiradi berilmasa barcha mamlaketlarni oladi)
-  PhoneNumber: string;
+  phoneNumber: string;
 }

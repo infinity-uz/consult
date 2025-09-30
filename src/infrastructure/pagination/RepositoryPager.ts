@@ -1,4 +1,7 @@
-import { IFindOptions, IResponsePagination } from '../response/success.interface';
+import {
+  IFindOptions,
+  IResponsePagination,
+} from '../response/success.interface';
 import { Pager } from './Pager';
 
 export class RepositoryPager {
@@ -17,6 +20,7 @@ export class RepositoryPager {
         where: options?.where,
         select: options?.select,
         include: options?.relations,
+        orderBy: options?.orderBy ?? { createdAt: 'desc' },
         skip: (page - 1) * pageSize,
         take: pageSize,
       }),

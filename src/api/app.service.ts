@@ -3,6 +3,8 @@ import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import cookieParser from 'cookie-parser';
 import { AppModule } from './app.module';
+import { config } from 'src/config/envConfig';
+
 
 export class Aplication {
   static async main(): Promise<void> {
@@ -10,6 +12,7 @@ export class Aplication {
 
     const app = await NestFactory.create(AppModule, {
       logger: ['error', 'warn', 'log'],
+      cors:true
     });
 
     // ========================= VALIDATSIYA =========================
@@ -26,7 +29,7 @@ export class Aplication {
     // ========================= COOKIE =========================
     app.use(cookieParser());
 
-    const api = 'api';
+    const api = config.API_VERSION
     // ========================= GLOBAL URL =========================
     app.setGlobalPrefix(api);
 
@@ -47,11 +50,11 @@ export class Aplication {
     const logging = new Logger('Swagger-cinemauz');
 
     // ========================= PORT =========================
-    const PORT = 3003;
+    const PORT = config.API_PORT;
 
     await app.listen(PORT, () => {
       setTimeout(() => {
-        logging.log(`Swagger UI: http://${process.env.APP_URL}:${PORT}/${api}`);
+        logging.log(`Swagger UI: http://${config.APP_URL}:${PORT}/${api}`);
       });
     });
   }

@@ -8,10 +8,10 @@ import {
 import { successRes } from '../response/success';
 import { RepositoryPager } from '../pagination/RepositoryPager';
 
-export class BaseService<CreateDto, UpdateDto, Entity extends { id: string }> {
+export class BaseService<CreateDto, UpdateDto, Entity extends { id: number }> {
   constructor(
-    private readonly prisma: PrismaClient,
-    private readonly model: any,
+    protected readonly prisma: PrismaClient,
+    protected readonly model: any,
   ) {}
 
   get getRepository() {
@@ -51,7 +51,7 @@ export class BaseService<CreateDto, UpdateDto, Entity extends { id: string }> {
   }
 
   async findOneById(
-    id: string,
+    id: number,
     options?: IFindOptions<Entity>,
   ): Promise<ISuccess> {
     const data = await this.model.findUnique({
@@ -65,7 +65,7 @@ export class BaseService<CreateDto, UpdateDto, Entity extends { id: string }> {
     return successRes(data);
   }
 
-  async update(id: string, dto: UpdateDto): Promise<ISuccess> {
+  async update(id: number, dto: UpdateDto): Promise<ISuccess> {
     await this.findOneById(id);
     const data = await this.model.update({
       where: { id },
@@ -74,7 +74,7 @@ export class BaseService<CreateDto, UpdateDto, Entity extends { id: string }> {
     return successRes(data);
   }
 
-  async delete(id: string): Promise<ISuccess> {
+  async delete(id: number): Promise<ISuccess> {
     await this.findOneById(id);
     await this.model.delete({ where: { id } });
     return successRes({});

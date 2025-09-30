@@ -28,11 +28,11 @@ CREATE TABLE "public"."Admin" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "isDeleted" BOOLEAN NOT NULL DEFAULT false,
-    "timeDeleted" TIMESTAMP(3) NOT NULL,
+    "timeDeleted" TIMESTAMP(3),
     "hashedPassword" TEXT NOT NULL,
-    "userName" TEXT NOT NULL,
+    "username" TEXT NOT NULL,
     "phoneNumber" TEXT NOT NULL,
-    "role" "public"."Role" NOT NULL DEFAULT 'PATEINTS',
+    "role" "public"."Role" NOT NULL DEFAULT 'ADMIN',
     "isActive" BOOLEAN NOT NULL DEFAULT false,
 
     CONSTRAINT "Admin_pkey" PRIMARY KEY ("id")
@@ -242,7 +242,7 @@ CREATE TABLE "public"."_BookDoctorTimeToDoctor" (
 );
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Admin_userName_key" ON "public"."Admin"("userName");
+CREATE UNIQUE INDEX "Admin_username_key" ON "public"."Admin"("username");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Admin_phoneNumber_key" ON "public"."Admin"("phoneNumber");

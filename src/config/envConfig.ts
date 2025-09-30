@@ -27,7 +27,7 @@ type ConfigType = {
 };
 
 export const config: ConfigType = {
-  API_PORT: Number(process.env.API_PORT),
+  API_PORT: Number(process.env.PORT),
   APP_URL: String(process.env.APP_URL),
   API_VERSION: String(process.env.API_VERSION),
   DB_URL: String(process.env.DEV_DB_URL),

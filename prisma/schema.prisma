@@ -70,9 +70,9 @@ model Admin {
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
   isDeleted      Boolean  @default(false)
-  timeDeleted    DateTime
+  timeDeleted    DateTime?
   hashedPassword String
-  userName       String   @unique()
+  username       String   @unique()
   phoneNumber    String   @unique()
   role           Role     @default(ADMIN)
   isActive       Boolean  @default(false)

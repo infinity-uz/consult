@@ -6,27 +6,34 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
 import { Observable } from 'rxjs';
 import { config } from 'src/config/envConfig';
+import { ROLES_KEY } from '../decorator/roles.decorator';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-  constructor(private readonly jwt: JwtService) {}
+  constructor(
+    private readonly jwt: JwtService,
+    private reflector: Reflector,
+  ) {}
 
-  canActivate(
-    context: ExecutionContext,
-  ): boolean | Promise<boolean> | Observable<boolean> {
-    const req = context.switchToHttp().getRequest();
-    const auth: string = req.headers.authorization;
-    if (!auth) {
-      throw new UnauthorizedException('Authorization error');
-    }
-    const bearer = auth.split(' ')[0];
-    const token = auth.split(' ')[1];
-    if (bearer !== 'Bearer' || !token) {
-      throw new UnauthorizedException('Unauthorized');
-    }
+  canActivate(ctx: ExecutionContext): boolean {
+    //  Agar route @Roles('public') bo'lsa — token talab qilinmaydi
+    const roles = this.reflector.getAllAndOverride<string[]>(ROLES_KEY, [
+      ctx.getHandler(),
+      ctx.getClass(),
+    ]);
+    
+    if (roles?.includes('public')) return true;
+
+    const req = ctx.switchToHttp().getRequest();
+    const auth = req.headers.authorization as string | undefined;
+
+    if (!auth?.startsWith('Bearer ')) throw new UnauthorizedException();
+
+    const token = auth.slice(7);
     try {
       const data = this.jwt.verify(token, { secret: config.TOKEN.ACCESS_KEY });
       if (data?.isActive != true) {
