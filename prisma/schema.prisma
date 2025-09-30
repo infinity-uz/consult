@@ -211,14 +211,17 @@ model Chat {
   rating      ChatRating
   comments    String
   complaint   ComplaintType @default(CHAT)
-  from        Int
-  to          Int
+  fromUserRole Role @default(PATEINTS)
+  fromUserId       Int
+  toUserRole Role @default(DOCTOR)
+  toUserId         Int
 
   doctor     Doctor   @relation(fields: [doctorId], references: [id])
   doctorId   Int
   pateints   Pateints @relation(fields: [pateintsId], references: [id])
   pateintsId Int
 }
+
 
 // --------------------------- WALLET ---------------------------
 
