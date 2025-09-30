@@ -74,7 +74,7 @@ model Admin {
   hashedPassword String
   userName       String   @unique()
   phoneNumber    String   @unique()
-  role           Role     @default(PATEINTS)
+  role           Role     @default(ADMIN)
   isActive       Boolean  @default(false)
 }
 
