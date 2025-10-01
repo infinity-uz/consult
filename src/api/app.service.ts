@@ -4,6 +4,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import cookieParser from 'cookie-parser';
 import { AppModule } from './app.module';
 import { config } from 'src/config/envConfig';
+import { AllExceptionFilter } from 'src/infrastructure/exception/AllException';
 
 
 export class Aplication {
@@ -14,6 +15,8 @@ export class Aplication {
       logger: ['error', 'warn', 'log'],
       cors:true
     });
+
+    app.useGlobalFilters(new AllExceptionFilter())
 
     // ========================= VALIDATSIYA =========================
 
@@ -35,7 +38,7 @@ export class Aplication {
 
     // ========================= SWAGGER =========================
     const configSwagger = new DocumentBuilder()
-      .setTitle('Theatr')
+      .setTitle('Consult')
       .setVersion('1.0.0')
       .addBearerAuth({
         type: 'http',
@@ -47,7 +50,7 @@ export class Aplication {
     const documentSwagger = SwaggerModule.createDocument(app, configSwagger);
     SwaggerModule.setup(api, app, documentSwagger);
 
-    const logging = new Logger('Swagger-cinemauz');
+    const logging = new Logger('Swagger-consultuz');
 
     // ========================= PORT =========================
     const PORT = config.API_PORT;

@@ -22,7 +22,7 @@ export class RolesGuard implements CanActivate {
 
     if (
       (req.user?.role && roles.includes(req.user.role)) ||
-      (roles.includes('ID') && req.user?.id === req.params.id)
+      (roles.includes('ID') && req.user?.id == req.params.id)
     ) {
       return true;
     }else{
