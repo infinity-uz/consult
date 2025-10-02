@@ -1,13 +1,16 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, PickType } from '@nestjs/swagger';
+import { CreateAdminDto } from './create-admin.dto';
 import {
   IsNotEmpty,
-  IsPhoneNumber,
   IsString,
   IsStrongPassword,
   MinLength,
 } from 'class-validator';
 
-export class CreateAdminDto {
+export class SignInDto extends PickType(CreateAdminDto, [
+  'username',
+  'password',
+]) {
   @ApiProperty({
     type: 'string',
     description: 'Username for admin',
@@ -26,13 +29,4 @@ export class CreateAdminDto {
   @IsStrongPassword()
   @IsNotEmpty()
   password: string;
-
-  @ApiProperty({
-    type: 'string',
-    description: 'Phone number for admin',
-    example: '+998901234567',
-  })
-  @IsNotEmpty()
-  @IsPhoneNumber('UZ') // 'UZ' kodi bilan Uzbekistan telefon raqamlarini tekshiradi berilmasa barcha mamlaketlarni oladi)
-  phoneNumber: string;
 }

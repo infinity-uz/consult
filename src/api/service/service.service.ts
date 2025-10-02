@@ -1,26 +1,58 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { BaseService } from 'src/infrastructure/base/base.service';
+import { PrismaService } from 'src/core/prisma.service';
+import { Service as ServiceModel } from 'generated/prisma';
 import { CreateServiceDto } from './dto/create-service.dto';
 import { UpdateServiceDto } from './dto/update-service.dto';
+import { ISuccess } from 'src/infrastructure/response/success.interface';
+import { successRes } from 'src/infrastructure/response/success';
 
 @Injectable()
-export class ServiceService {
-  create(createServiceDto: CreateServiceDto) {
-    return 'This action adds a new service';
+export class ServiceService extends BaseService<
+  CreateServiceDto,
+  UpdateServiceDto,
+  ServiceModel
+> {
+  constructor(protected readonly prisma: PrismaService) {
+    super(prisma, prisma.service);
   }
 
-  findAll() {
-    return `This action returns all service`;
+  async create(dto: CreateServiceDto): Promise<ISuccess> {
+    const exists = await this.prisma.service.findFirst({
+      where: { name: dto.name },
+    });
+    if (exists) throw new ConflictException('Service already exists');
+
+    const data: any = {
+      ...dto,
+    };
+
+    if (dto.timeDeleted !== undefined) {
+      data.timeDeleted =
+        dto.timeDeleted instanceof Date
+          ? dto.timeDeleted
+          : new Date(dto.timeDeleted);
+    }
+
+    const service = await this.prisma.service.create({ data });
+
+    return successRes(service, 201);
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} service`;
-  }
+  async update(id: number, dto: UpdateServiceDto): Promise<ISuccess> {
+    const exists = await this.prisma.service.findUnique({ where: { id } });
+    if (!exists) {
+      throw new NotFoundException(`Service with Id ${id} not found`);
+    }
 
-  update(id: number, updateServiceDto: UpdateServiceDto) {
-    return `This action updates a #${id} service`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} service`;
+    const service = await this.prisma.service.update({
+      where: { id },
+      data: dto,
+    });
+    return successRes(service);
   }
 }
