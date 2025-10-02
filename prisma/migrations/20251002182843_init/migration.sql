@@ -44,7 +44,7 @@ CREATE TABLE "public"."Doctor" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "isDeleted" BOOLEAN NOT NULL DEFAULT false,
-    "timeDeleted" TIMESTAMP(3) NOT NULL,
+    "timeDeleted" TIMESTAMP(3),
     "firstName" TEXT NOT NULL,
     "lastName" TEXT NOT NULL,
     "phoneNumber" TEXT NOT NULL,

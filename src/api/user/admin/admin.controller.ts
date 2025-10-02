@@ -29,7 +29,7 @@ import { CookieGetter } from 'src/common/decorator/cookie-getter.decorator';
 import { AuthService } from '../auth/auth.service';
 import { GetRequestUser } from 'src/common/decorator/get-request-user.decorator';
 import { type IToken } from 'src/infrastructure/token/interface';
-import { softDeleteDto } from './dto/soft-delete.dto';
+import { softDeleteDto } from 'src/common/dto/soft-delete.dto';
 
 @UseGuards(AuthGuard, RolesGuard)
 @Controller('admin')
@@ -356,7 +356,8 @@ export class AdminController {
     return this.adminService.updateAdmin(+id, dto, user);
   }
 
-  @ApiOperation({ summary: 'Delete admin' })
+  // ------------------- DELETE -------------------
+  @ApiOperation({ summary: 'Delete doctor' })
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Delete admin',
@@ -381,7 +382,7 @@ export class AdminController {
     },
   })
   @AccessRoles(Roles.SUPERADMIN)
-  @Delete()
+  @Delete(':id')
   @ApiBearerAuth()
   delete(@Param('id') id: number) {
     return this.adminService.remove(id);

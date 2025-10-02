@@ -14,7 +14,7 @@ import { TokenService } from 'src/infrastructure/token/Token';
 import { PrismaClient } from 'generated/prisma';
 import { PrismaService } from 'src/core/prisma.service';
 import { ConfirmPhoneNumberDto } from 'src/common/dto/registerPhoneNumber-doctor.dto';
-import { RedisService } from 'src/core/redis/redis.service'
+import { RedisService } from 'src/core/redis/redis.service';
 import { ConfirmOtpDto } from 'src/common/dto/confirmOtp-doctor.dto';
 
 @Injectable()
@@ -98,18 +98,22 @@ export class AuthService {
     const otp = this.generateOtp();
     await this.redis.set(phoneNumber, otp, 5);
 
-    return successRes({ url: `api/v1/${String(model)}/confirmOTP`, otp, requestMethod: 'POST' });
+    return successRes({
+      url: `api/v1/${String(model)}/confirmOTP`,
+      otp,
+      requestMethod: 'POST',
+    });
   }
 
-  async confirmOtp(model:string, dto: ConfirmOtpDto) {
+  async confirmOtp(model: string, dto: ConfirmOtpDto) {
     const { otp, phoneNumber } = dto;
     const data = await this.redis.get<string>(phoneNumber);
-    
+
     if (!data) throw new BadRequestException('otp expired') as any;
-    
+
     if (otp == data) {
-      await this.redis.del(phoneNumber)
-      return successRes({ url: `api/v1/${model}/register`, requestMethod: 'POST' }, 200);
+      await this.redis.del(phoneNumber);
+      return { message: 'success', statusCode: 200 };
     }
     throw new BadRequestException('otp expired or incorect');
   }

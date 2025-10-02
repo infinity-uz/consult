@@ -22,7 +22,7 @@ import { IToken } from 'src/infrastructure/token/interface';
 import { Roles } from 'src/common/enum/Roles.enum';
 import { config } from 'src/config/envConfig';
 import { AuthService } from '../auth/auth.service';
-import { softDeleteDto } from './dto/soft-delete.dto';
+import { softDeleteDto } from 'src/common/dto/soft-delete.dto';
 
 @Injectable()
 export class AdminService

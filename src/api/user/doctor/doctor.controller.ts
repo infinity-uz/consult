@@ -23,6 +23,10 @@ import { Roles } from 'src/common/enum/Roles.enum';
 import { type Response } from 'express';
 import { forGetOTPData } from 'src/common/document/forgetOTPData';
 import { PaginationQueryDto } from 'src/common/dto/query-pagination.dto';
+import { softDeleteDto } from 'src/common/dto/soft-delete.dto';
+import { SignInDoctorDto } from './dto/signIn-doctor.dto';
+import { GetRequestUser } from 'src/common/decorator/get-request-user.decorator';
+import { type IToken } from 'src/infrastructure/token/interface';
 
 @Controller('doctor')
 export class DoctorController {
@@ -77,8 +81,7 @@ export class DoctorController {
         statusCode: 200,
         message: 'success',
         data: {
-          url: 'api/v1/doctor/register',
-          requestMehod: 'Post',
+          message: 'success',
         },
       },
     },
@@ -99,6 +102,40 @@ export class DoctorController {
   @Post('confirmOTP')
   confirmOTP(@Body() dto: ConfirmOtpDto) {
     return this.authService.confirmOtp('doctor', dto);
+  }
+
+  // ------------------- SIGNIN -------------------
+  @ApiOperation({ summary: 'Sign in doctor' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Doctor signed successfully',
+    schema: {
+      example: {
+        statusCode: 201,
+        message: 'success',
+        data: [],
+      },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Failed signin doctor',
+    schema: {
+      example: {
+        statusCode: 400,
+        error: {
+          message: 'No doctor found for this number',
+        },
+      },
+    },
+  })
+  @AccessRoles('public')
+  @Post('signin')
+  signin(
+    @Body() signInDto: SignInDoctorDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    return this.doctorService.signIn(signInDto, res);
   }
 
   // ---------------- NEW TOKEN ----------------
@@ -162,20 +199,20 @@ export class DoctorController {
       },
     },
   })
-  @AccessRoles(Roles.SUPERADMIN, Roles.ADMIN)
+  @AccessRoles(Roles.DOCTOR)
   @Post('signout')
   @ApiBearerAuth()
   signOut(
-    @CookieGetter('adminToken') token: string,
+    @CookieGetter('doctorToken') token: string,
     @Res({ passthrough: true }) res: Response,
   ) {
     return this.authService.signOut('doctor', token, res, 'doctorToken');
   }
 
-  @Post('registr')
-  create(@Body() createDoctorDto: CreateDoctorDto) {
-    return this.doctorService.create(createDoctorDto);
-  }
+  // @Post('registr')
+  // create(@Body() createDoctorDto: CreateDoctorDto) {
+  //   return this.doctorService.create(createDoctorDto);
+  // }
 
   // ----------- FIND ALL WITH PAGINATION -----------
   @ApiOperation({ summary: 'Find all doctors with pagination' })
@@ -204,7 +241,7 @@ export class DoctorController {
   })
   @AccessRoles(Roles.SUPERADMIN)
   @Get()
-  // @ApiBearerAuth()
+  @ApiBearerAuth()
   async findAllWithPagination(@Query() query: PaginationQueryDto) {
     return this.doctorService.findAllWithPagination({
       where: query.query
@@ -222,38 +259,38 @@ export class DoctorController {
   }
 
   // ------------------- FIND ALL -------------------
-    @ApiOperation({ summary: 'Get all doctors' })
-    @ApiResponse({
-      status: HttpStatus.OK,
-      description: 'All doctors get successfully ',
-      schema: {
-        example: {
-          statusCode: 200,
-          message: 'success',
-          data: [],
+  @ApiOperation({ summary: 'Get all doctors' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'All doctors get successfully ',
+    schema: {
+      example: {
+        statusCode: 200,
+        message: 'success',
+        data: [],
+      },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'Failed get doctors',
+    schema: {
+      example: {
+        statusCode: 403,
+        error: {
+          message: 'Forbidden user',
         },
       },
-    })
-    @ApiResponse({
-      status: HttpStatus.FORBIDDEN,
-      description: 'Failed get doctors',
-      schema: {
-        example: {
-          statusCode: 403,
-          error: {
-            message: 'Forbidden user',
-          },
-        },
-      },
-    })
-    @AccessRoles(Roles.SUPERADMIN)
-    @Get('all')
-    @ApiBearerAuth()
-    findAll() {
-      return this.doctorService.findAll({
-        orderBy: { createdAt: 'desc' },
-      });
-    }
+    },
+  })
+  @AccessRoles(Roles.SUPERADMIN)
+  @Get('all')
+  @ApiBearerAuth()
+  findAll() {
+    return this.doctorService.findAll({
+      orderBy: { createdAt: 'desc' },
+    });
+  }
 
   // ----------------- FIND BY ID -----------------
   @ApiOperation({ summary: 'Get doctor by id' })
@@ -285,5 +322,107 @@ export class DoctorController {
   @ApiBearerAuth()
   findbyId(@Param('id') id: number) {
     return this.doctorService.findOneById(id);
+  }
+
+   // ------------------- UPDATE -------------------
+    @ApiOperation({ summary: 'Updating doctor' })
+    @ApiResponse({
+      status: HttpStatus.OK,
+      description: 'Updating doctor',
+      schema: {
+        example: {
+          statusCode: 200,
+          message: 'success',
+          data: {},
+        },
+      },
+    })
+    @ApiResponse({
+      status: HttpStatus.NOT_FOUND,
+      description: 'Failed updating doctor',
+      schema: {
+        example: {
+          statusCode: 404,
+          error: {
+            message: 'Not found',
+          },
+        },
+      },
+    })
+    @AccessRoles(Roles.SUPERADMIN, 'ID')
+    @Patch(':id')
+    @ApiBearerAuth()
+    update(
+      @Param('id') id: number,
+      @Body() dto: UpdateDoctorDto,
+      @GetRequestUser('user') user: IToken,
+    ) {
+      console.log(id);
+      return this.doctorService.updateDoctor(+id, dto, user);
+    }
+
+
+  // --------------- SOFT DELETE ------------------
+  @ApiOperation({ summary: 'Soft delete doctor' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Soft delete doctor',
+    schema: {
+      example: {
+        statusCode: 200,
+        message: 'success',
+        data: {},
+      },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Failed soft delete doctor',
+    schema: {
+      example: {
+        statusCode: 404,
+        error: {
+          message: 'Not found',
+        },
+      },
+    },
+  })
+  @AccessRoles(Roles.SUPERADMIN)
+  @Patch('softDelete:id')
+  @ApiBearerAuth()
+  softDelete(@Param('id') id: number, @Body() dto: softDeleteDto) {
+    return this.doctorService.softDelete(id, dto);
+  }
+
+  // ------------------- DELETE -------------------
+  @ApiOperation({ summary: 'Delete doctor' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Delete doctor',
+    schema: {
+      example: {
+        statusCode: 200,
+        message: 'success',
+        data: {},
+      },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Failed delete doctor',
+    schema: {
+      example: {
+        statusCode: 404,
+        error: {
+          message: 'Not found',
+        },
+      },
+    },
+  })
+  @AccessRoles(Roles.SUPERADMIN)
+  @Delete(':id')
+  @ApiBearerAuth()
+  delete(@Param('id') id: number) {
+    return this.doctorService.delete(id);
   }
 }
