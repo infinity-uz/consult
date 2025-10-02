@@ -248,7 +248,7 @@ export class DoctorController {
     })
     @AccessRoles(Roles.SUPERADMIN)
     @Get('all')
-    // @ApiBearerAuth()
+    @ApiBearerAuth()
     findAll() {
       return this.doctorService.findAll({
         orderBy: { createdAt: 'desc' },
@@ -282,7 +282,7 @@ export class DoctorController {
   })
   @AccessRoles(Roles.SUPERADMIN, 'ID')
   @Get(':id')
-  // @ApiBearerAuth()
+  @ApiBearerAuth()
   findbyId(@Param('id') id: number) {
     return this.doctorService.findOneById(id);
   }
