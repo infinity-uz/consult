@@ -166,7 +166,8 @@ CREATE TABLE "public"."Wallet" (
     "phoneNumber" TEXT NOT NULL,
     "type" "public"."CardType" NOT NULL DEFAULT 'HUMO',
     "date" TEXT NOT NULL,
-    "cvv" INTEGER NOT NULL,
+    "cvv" INTEGER,
+    "balance" DOUBLE PRECISION NOT NULL DEFAULT 0.00,
     "doctorId" INTEGER,
     "pateintsId" INTEGER,
 
