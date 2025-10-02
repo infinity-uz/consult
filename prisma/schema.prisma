@@ -206,7 +206,7 @@ model Chat {
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
   isDeleted   Boolean       @default(false)
-  timeDeleted DateTime
+  timeDeleted DateTime?
   
   rating      ChatRating
   comments    String

@@ -5,9 +5,9 @@ import { ChatRating, Role } from "generated/prisma";
 
 export class CreateChatDto {
     @ApiProperty()
-    @IsOptional()
+    @IsNotEmpty()
     @IsEnum(ChatRating)
-    rating?: ChatRating;
+    rating: ChatRating;
 
     @ApiProperty()
     @IsNotEmpty()
