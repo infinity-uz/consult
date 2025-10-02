@@ -10,7 +10,6 @@ import {
   Query,
   Res,
   UseGuards,
-  ParseIntPipe,
 } from '@nestjs/common';
 import { AdminService } from './admin.service';
 import { CreateAdminDto } from './dto/create-admin.dto';
@@ -184,7 +183,7 @@ export class AdminController {
     description: 'All admins get successfully with pagination',
     schema: {
       example: {
-        statusCode: 201,
+        statusCode: 200,
         message: 'success',
         data: paginationData,
       },

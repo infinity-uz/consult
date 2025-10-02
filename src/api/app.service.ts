@@ -6,17 +6,16 @@ import { AppModule } from './app.module';
 import { config } from 'src/config/envConfig';
 import { AllExceptionFilter } from 'src/infrastructure/exception/AllException';
 
-
 export class Aplication {
   static async main(): Promise<void> {
     // ========================= DATABASE =========================
 
     const app = await NestFactory.create(AppModule, {
       logger: ['error', 'warn', 'log'],
-      cors:true
+      cors: true,
     });
 
-    app.useGlobalFilters(new AllExceptionFilter())
+    app.useGlobalFilters(new AllExceptionFilter());
 
     // ========================= VALIDATSIYA =========================
 
@@ -32,7 +31,7 @@ export class Aplication {
     // ========================= COOKIE =========================
     app.use(cookieParser());
 
-    const api = config.API_VERSION
+    const api = config.API_VERSION;
     // ========================= GLOBAL URL =========================
     app.setGlobalPrefix(api);
 

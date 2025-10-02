@@ -93,7 +93,6 @@ export class AdminService
     return successRes(newAdmin, 201);
   }
   async findOne(id: number): Promise<ISuccess> {
-
     const admin = await this.prisma.admin.findUnique({ where: { id } });
 
     if (!admin) throw new NotFoundException(`Admin not found`);

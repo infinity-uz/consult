@@ -6,8 +6,8 @@ import { TokenService } from 'src/infrastructure/token/Token';
 import { AuthModule } from '../auth/auth.module';
 
 @Module({
-  imports:[AuthModule],
-  controllers: [AdminController,],
+  imports: [AuthModule],
+  controllers: [AdminController],
   providers: [AdminService, CryptoService, TokenService],
 })
 export class AdminModule {}
