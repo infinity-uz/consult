@@ -259,7 +259,7 @@ export class AdminController {
   @ApiOperation({ summary: 'Get admin by id' })
   @ApiResponse({
     status: HttpStatus.OK,
-    description: 'Get adminby id successfully ',
+    description: 'Get admin by id successfully ',
     schema: {
       example: {
         statusCode: 200,

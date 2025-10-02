@@ -221,9 +221,69 @@ export class DoctorController {
     });
   }
 
-  @Get('all')
-  findAll() {
-    return this.doctorService.findAll({ orderBy: { createdAt: 'desc' } });
-  }
+  // ------------------- FIND ALL -------------------
+    @ApiOperation({ summary: 'Get all doctors' })
+    @ApiResponse({
+      status: HttpStatus.OK,
+      description: 'All doctors get successfully ',
+      schema: {
+        example: {
+          statusCode: 200,
+          message: 'success',
+          data: [],
+        },
+      },
+    })
+    @ApiResponse({
+      status: HttpStatus.FORBIDDEN,
+      description: 'Failed get doctors',
+      schema: {
+        example: {
+          statusCode: 403,
+          error: {
+            message: 'Forbidden user',
+          },
+        },
+      },
+    })
+    @AccessRoles(Roles.SUPERADMIN)
+    @Get('all')
+    // @ApiBearerAuth()
+    findAll() {
+      return this.doctorService.findAll({
+        orderBy: { createdAt: 'desc' },
+      });
+    }
 
+  // ----------------- FIND BY ID -----------------
+  @ApiOperation({ summary: 'Get doctor by id' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Get doctor by id successfully ',
+    schema: {
+      example: {
+        statusCode: 200,
+        message: 'success',
+        data: {},
+      },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'Failed get doctor by id',
+    schema: {
+      example: {
+        statusCode: 403,
+        error: {
+          message: 'Forbidden user',
+        },
+      },
+    },
+  })
+  @AccessRoles(Roles.SUPERADMIN, 'ID')
+  @Get(':id')
+  // @ApiBearerAuth()
+  findbyId(@Param('id') id: number) {
+    return this.doctorService.findOneById(id);
+  }
 }
