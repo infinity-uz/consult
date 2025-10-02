@@ -22,10 +22,10 @@ export class SpecialityService extends BaseService<
   }
 
   async create(dto: CreateSpecialityDto): Promise<ISuccess> {
-    const exists = await this.prisma.service.findFirst({
+    const existsName = await this.prisma.service.findFirst({
       where: { name: dto.name },
     });
-    if (exists) throw new ConflictException('Service already exists');
+    if (existsName) throw new ConflictException('Service already exists');
 
     const data: any = {
       ...dto,
