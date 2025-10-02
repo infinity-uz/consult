@@ -56,44 +56,46 @@ enum ChatRating {
 }
 
 enum ComplaintType {
-  COMMENT // kommentariya
-  REVIEW // sharh
-  CHAT // chat
-  COMPLAINT // shikoyat
-  REASON // o'tkazib yuborish sababi (reason)
+  COMMENT
+  REVIEW
+  CHAT
+  COMPLAINT
+  REASON
 }
 
 // --------------------------- ADMIN ---------------------------
 
 model Admin {
-  id             Int       @id @default(autoincrement())
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
-  isDeleted      Boolean   @default(false)
-  timeDeleted    DateTime?
+  id          Int       @id @default(autoincrement())
+  createdAt   DateTime? @default(now())
+  updatedAt   DateTime? @updatedAt
+  isDeleted   Boolean?  @default(false)
+  timeDeleted DateTime?
+
   hashedPassword String
-  username       String    @unique()
-  phoneNumber    String    @unique()
-  role           Role      @default(ADMIN)
-  isActive       Boolean   @default(false)
+  username       String  @unique()
+  phoneNumber    String  @unique()
+  role           Role    @default(ADMIN)
+  isActive       Boolean @default(false)
 }
 
 // --------------------------- DOCTOR ---------------------------
 
 model Doctor {
-  id          Int      @id @default(autoincrement())
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  isDeleted   Boolean  @default(false)
-  timeDeleted DateTime
+  id          Int       @id @default(autoincrement())
+  createdAt   DateTime? @default(now())
+  updatedAt   DateTime? @updatedAt
+  isDeleted   Boolean?  @default(false)
+  timeDeleted DateTime?
+
   firstName   String
   lastName    String
-  phoneNumber String   @unique()
+  phoneNumber String  @unique()
   age         Int
   gender      Gender
   location    String
-  isActive    Boolean  @default(false)
-  role        Role     @default(DOCTOR)
+  isActive    Boolean @default(false)
+  role        Role    @default(DOCTOR)
 
   services       Service          @relation(fields: [servicesId], references: [id])
   servicesId     Int
@@ -108,11 +110,11 @@ model Doctor {
 // --------------------------- PATIENTS ---------------------------
 
 model Pateints {
-  id          Int      @id @default(autoincrement())
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  isDeleted   Boolean  @default(false)
-  timeDeleted DateTime
+  id          Int       @id @default(autoincrement())
+  createdAt   DateTime? @default(now())
+  updatedAt   DateTime? @updatedAt
+  isDeleted   Boolean?  @default(false)
+  timeDeleted DateTime?
 
   firstName   String
   lastName    String
@@ -152,11 +154,11 @@ model DoctorDocument {
 // --------------------------- IMAGE ---------------------------
 
 model Image {
-  id          Int      @id @default(autoincrement())
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  isDeleted   Boolean  @default(false)
-  timeDeleted DateTime
+  id          Int       @id @default(autoincrement())
+  createdAt   DateTime? @default(now())
+  updatedAt   DateTime? @updatedAt
+  isDeleted   Boolean?  @default(false)
+  timeDeleted DateTime?
 
   imageUrl String
   name     String
@@ -168,11 +170,11 @@ model Image {
 // --------------------------- SPECIALITY ---------------------------
 
 model Speciality {
-  id          Int      @id @default(autoincrement())
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  isDeleted   Boolean  @default(false)
-  timeDeleted DateTime
+  id          Int       @id @default(autoincrement())
+  createdAt   DateTime? @default(now())
+  updatedAt   DateTime? @updatedAt
+  isDeleted   Boolean?  @default(false)
+  timeDeleted DateTime?
 
   name        String  @unique()
   isActive    Boolean @default(true)
@@ -185,11 +187,11 @@ model Speciality {
 // --------------------------- SERVICE ---------------------------
 
 model Service {
-  id          Int      @id @default(autoincrement())
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  isDeleted   Boolean  @default(false)
-  timeDeleted DateTime
+  id          Int       @id @default(autoincrement())
+  createdAt   DateTime? @default(now())
+  updatedAt   DateTime? @updatedAt
+  isDeleted   Boolean?  @default(false)
+  timeDeleted DateTime?
 
   name        String
   price       Decimal
@@ -202,19 +204,19 @@ model Service {
 // --------------------------- CHAT ---------------------------
 
 model Chat {
-  id          Int           @id @default(autoincrement())
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-  isDeleted   Boolean       @default(false)
+  id          Int       @id @default(autoincrement())
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  isDeleted   Boolean   @default(false)
   timeDeleted DateTime?
-  
-  rating      ChatRating
-  comments    String
-  complaint   ComplaintType @default(CHAT)
-  fromUserRole Role @default(PATEINTS)
-  fromUserId       Int
-  toUserRole Role @default(DOCTOR)
-  toUserId         Int
+
+  rating       ChatRating
+  comments     String
+  complaint    ComplaintType @default(CHAT)
+  fromUserRole Role          @default(PATEINTS)
+  fromUserId   Int
+  toUserRole   Role          @default(DOCTOR)
+  toUserId     Int
 
   doctor     Doctor   @relation(fields: [doctorId], references: [id])
   doctorId   Int
@@ -222,15 +224,14 @@ model Chat {
   pateintsId Int
 }
 
-
 // --------------------------- WALLET ---------------------------
 
 model Wallet {
-  id          Int      @id @default(autoincrement())
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  isDeleted   Boolean  @default(false)
-  timeDeleted DateTime
+  id          Int       @id @default(autoincrement())
+  createdAt   DateTime? @default(now())
+  updatedAt   DateTime? @updatedAt
+  isDeleted   Boolean?  @default(false)
+  timeDeleted DateTime?
 
   name        String
   cardNumber  String   @unique()
@@ -294,11 +295,11 @@ model Payment {
 // --------------------------- BOOK DOCTOR TIME ---------------------------
 
 model BookDoctorTime {
-  id          Int      @id @default(autoincrement())
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  isDeleted   Boolean  @default(false)
-  timeDeleted DateTime
+  id          Int       @id @default(autoincrement())
+  createdAt   DateTime? @default(now())
+  updatedAt   DateTime? @updatedAt
+  isDeleted   Boolean?  @default(false)
+  timeDeleted DateTime?
 
   date       String
   startTime  String
