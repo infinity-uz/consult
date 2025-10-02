@@ -202,23 +202,26 @@ model Service {
 // --------------------------- CHAT ---------------------------
 
 model Chat {
-  id          Int      @id @default(autoincrement())
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  isDeleted   Boolean  @default(false)
-  timeDeleted DateTime
-
-  rating    ChatRating
-  comments  String
-  complaint ComplaintType @default(CHAT)
-  from      Int
-  to        Int
+  id          Int           @id @default(autoincrement())
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  isDeleted   Boolean       @default(false)
+  timeDeleted DateTime?
+  
+  rating      ChatRating
+  comments    String
+  complaint   ComplaintType @default(CHAT)
+  fromUserRole Role @default(PATEINTS)
+  fromUserId       Int
+  toUserRole Role @default(DOCTOR)
+  toUserId         Int
 
   doctor     Doctor   @relation(fields: [doctorId], references: [id])
   doctorId   Int
   pateints   Pateints @relation(fields: [pateintsId], references: [id])
   pateintsId Int
 }
+
 
 // --------------------------- WALLET ---------------------------
 
