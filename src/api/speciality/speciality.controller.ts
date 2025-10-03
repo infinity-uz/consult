@@ -79,10 +79,7 @@ export class SpecialityController {
   })
 
   @Get()
-  @ApiBearerAuth()
-  @AccessRoles(Roles.SUPERADMIN, Roles.DOCTOR,
-    Roles.PATEINTS, Roles.ADMIN
-  )
+  
   async findAll(@Query() query: PaginationQueryDto) {
     return this.specialityService.findAllWithPagination({
       where: query.query
@@ -105,10 +102,6 @@ export class SpecialityController {
     status: HttpStatus.CREATED,
     description: 'Speciality Find successfully',
   })
-  @ApiBearerAuth()
-  @AccessRoles(Roles.SUPERADMIN, Roles.DOCTOR,
-    Roles.PATEINTS, Roles.ADMIN
-  )
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.specialityService.findOneById(+id);

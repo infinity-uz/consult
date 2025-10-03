@@ -79,10 +79,7 @@ export class ServiceController {
   })
   
   @Get()
-  @ApiBearerAuth()
-  @AccessRoles(Roles.SUPERADMIN, Roles.DOCTOR,
-    Roles.PATEINTS, Roles.ADMIN
-  )
+  
   async findAll(@Query() query: PaginationQueryDto) {
     return this.serviceService.findAllWithPagination({
       where: query.query
@@ -105,10 +102,7 @@ export class ServiceController {
     status: HttpStatus.CREATED,
     description: 'Service Find successfully',
   })
-  @ApiBearerAuth()
-  @AccessRoles(Roles.SUPERADMIN, Roles.DOCTOR,
-    Roles.PATEINTS, Roles.ADMIN
-  )
+  
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.serviceService.findOneById(+id);
@@ -143,9 +137,10 @@ export class ServiceController {
     },
   },
 })
-@AccessRoles(Roles.SUPERADMIN)  
+ 
 @Delete(':id')
 @ApiBearerAuth()
+@AccessRoles(Roles.SUPERADMIN) 
 delete(@Param('id') id: string) {
   return this.serviceService.delete(+id);
 }
