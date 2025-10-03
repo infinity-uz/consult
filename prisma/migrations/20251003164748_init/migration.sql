@@ -41,15 +41,9 @@ CREATE TABLE "public"."Admin" (
 -- CreateTable
 CREATE TABLE "public"."Doctor" (
     "id" SERIAL NOT NULL,
-<<<<<<<< HEAD:prisma/migrations/20251002182843_init/migration.sql
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
-    "isDeleted" BOOLEAN NOT NULL DEFAULT false,
-========
     "createdAt" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3),
     "isDeleted" BOOLEAN DEFAULT false,
->>>>>>>> dev:prisma/migrations/20251002170218_init/migration.sql
     "timeDeleted" TIMESTAMP(3),
     "firstName" TEXT NOT NULL,
     "lastName" TEXT NOT NULL,
