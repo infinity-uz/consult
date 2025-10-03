@@ -55,4 +55,19 @@ export class ServiceService extends BaseService<
     });
     return successRes(service);
   }
+
+  async delete(id: number): Promise<ISuccess> {
+  const exists = await this.prisma.service.findUnique({ where: { id } });
+  if (!exists) {
+    throw new NotFoundException(`Service with id ${id} not found`);
+  }
+
+  const deletedService = await this.prisma.service.update({
+    where: { id },
+    data: { timeDeleted: new Date() },
+  });
+
+  return successRes(deletedService, 200);
+}
+
 }

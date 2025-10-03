@@ -55,4 +55,19 @@ export class SpecialityService extends BaseService<
     });
     return successRes(speciality);
   }
+
+  async delete(id: number): Promise<ISuccess> {
+  const exists = await this.prisma.speciality.findUnique({ where: { id } });
+  if (!exists) {
+    throw new NotFoundException(`Speciality with id ${id} not found`);
+  }
+
+  const deletedSpeciality = await this.prisma.speciality.update({
+    where: { id },
+    data: { timeDeleted: new Date() },
+  });
+
+  return successRes(deletedSpeciality, 200);
+}
+
 }

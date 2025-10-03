@@ -8,6 +8,7 @@ import {
   UseGuards,
   Get,
   Query,
+  Delete,
 } from '@nestjs/common';
 import { SpecialityService } from './speciality.service';
 import { CreateSpecialityDto } from './dto/create-speciality.dto';
@@ -32,7 +33,7 @@ export class SpecialityController {
     description: 'Speciality created successfully',
   })
   @ApiBearerAuth()
-  @AccessRoles(Roles.SUPERADMIN)
+  @AccessRoles(Roles.SUPERADMIN, Roles.DOCTOR)
   @Post()
   create(@Body() dto: CreateSpecialityDto) {
     return this.specialityService.create(dto);
@@ -45,7 +46,7 @@ export class SpecialityController {
     description: 'Speciality updated successfully',
   })
   @ApiBearerAuth()
-  @AccessRoles(Roles.SUPERADMIN)
+  @AccessRoles(Roles.SUPERADMIN, Roles.DOCTOR)
   @Patch(':id')
   update(@Param('id') id: string, @Body() dto: UpdateSpecialityDto) {
     return this.specialityService.update(+id, dto);
@@ -76,9 +77,12 @@ export class SpecialityController {
       },
     },
   })
-  @AccessRoles(Roles.SUPERADMIN)
+
   @Get()
   @ApiBearerAuth()
+  @AccessRoles(Roles.SUPERADMIN, Roles.DOCTOR,
+    Roles.PATEINTS, Roles.ADMIN
+  )
   async findAll(@Query() query: PaginationQueryDto) {
     return this.specialityService.findAllWithPagination({
       where: query.query
@@ -102,9 +106,48 @@ export class SpecialityController {
     description: 'Speciality Find successfully',
   })
   @ApiBearerAuth()
-  @AccessRoles(Roles.SUPERADMIN)
+  @AccessRoles(Roles.SUPERADMIN, Roles.DOCTOR,
+    Roles.PATEINTS, Roles.ADMIN
+  )
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.specialityService.findOneById(+id);
   }
+
+  // ----------- DELETE -----------
+@ApiOperation({ summary: 'Soft delete speciality' })
+@ApiResponse({
+  status: HttpStatus.OK,
+  description: 'Speciality deleted successfully',
+  schema: {
+    example: {
+      statusCode: 200,
+      message: 'success',
+      data: {
+        id: 1,
+        name: 'Pediatrics',
+        timeDeleted: '2025-10-01T12:00:00.000Z',
+      },
+    },
+  },
+})
+@ApiResponse({
+  status: HttpStatus.NOT_FOUND,
+  description: 'Speciality not found',
+  schema: {
+    example: {
+      statusCode: 404,
+      error: {
+        message: 'Speciality with id 1 not found',
+      },
+    },
+  },
+})
+@AccessRoles(Roles.SUPERADMIN)
+@Delete(':id')
+@ApiBearerAuth()
+delete(@Param('id') id: string) {
+  return this.specialityService.delete(+id);
+}
+
 }

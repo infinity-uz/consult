@@ -8,6 +8,7 @@ import {
   UseGuards,
   Get,
   Query,
+  Delete,
 } from '@nestjs/common';
 import { ServiceService } from './service.service';
 import { CreateServiceDto } from './dto/create-service.dto';
@@ -32,7 +33,7 @@ export class ServiceController {
     description: 'Service created successfully',
   })
   @ApiBearerAuth()
-  @AccessRoles(Roles.SUPERADMIN)
+  @AccessRoles(Roles.SUPERADMIN, Roles.DOCTOR)
   @Post()
   create(@Body() dto: CreateServiceDto) {
     return this.serviceService.create(dto);
@@ -45,7 +46,7 @@ export class ServiceController {
     description: 'Service updated successfully',
   })
   @ApiBearerAuth()
-  @AccessRoles(Roles.SUPERADMIN)
+  @AccessRoles(Roles.SUPERADMIN, Roles.DOCTOR)
   @Patch(':id')
   update(@Param('id') id: string, @Body() dto: UpdateServiceDto) {
     return this.serviceService.update(+id, dto);
@@ -76,9 +77,12 @@ export class ServiceController {
       },
     },
   })
-  @AccessRoles(Roles.SUPERADMIN)
+  
   @Get()
   @ApiBearerAuth()
+  @AccessRoles(Roles.SUPERADMIN, Roles.DOCTOR,
+    Roles.PATEINTS, Roles.ADMIN
+  )
   async findAll(@Query() query: PaginationQueryDto) {
     return this.serviceService.findAllWithPagination({
       where: query.query
@@ -102,9 +106,48 @@ export class ServiceController {
     description: 'Service Find successfully',
   })
   @ApiBearerAuth()
-  @AccessRoles(Roles.SUPERADMIN)
+  @AccessRoles(Roles.SUPERADMIN, Roles.DOCTOR,
+    Roles.PATEINTS, Roles.ADMIN
+  )
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.serviceService.findOneById(+id);
   }
+
+  // --------------------Delete ---------------------
+@ApiOperation({ summary: 'Soft delete service' })
+@ApiResponse({
+  status: HttpStatus.OK,
+  description: 'Service deleted successfully',
+  schema: {
+    example: {
+      statusCode: 200,
+      message: 'success',
+      data: {
+        id: 1,
+        name: 'Cardiology',
+        timeDeleted: '2025-10-01T12:00:00.000Z',
+      },
+    },
+  },
+})
+@ApiResponse({
+  status: HttpStatus.NOT_FOUND,
+  description: 'Service not found',
+  schema: {
+    example: {
+      statusCode: 404,
+      error: {
+        message: 'Service with id 1 not found',
+      },
+    },
+  },
+})
+@AccessRoles(Roles.SUPERADMIN)  
+@Delete(':id')
+@ApiBearerAuth()
+delete(@Param('id') id: string) {
+  return this.serviceService.delete(+id);
+}
+
 }
