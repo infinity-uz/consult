@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ChatModule } from './chat/chat.module';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule } from '@nestjs/config';
 import { AdminModule } from './user/admin/admin.module';
@@ -20,6 +21,8 @@ import { AuthModule } from './user/auth/auth.module';
     AdminModule,
     DoctorModule,
     AuthModule,
+    ChatModule,
+
   ],
   controllers: [],
 })

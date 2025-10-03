@@ -27,8 +27,7 @@ import { softDeleteDto } from 'src/common/dto/soft-delete.dto';
 @Injectable()
 export class AdminService
   extends BaseService<CreateAdminDto, UpdateAdminDto, Admin>
-  implements OnModuleInit
-{
+  implements OnModuleInit {
   constructor(
     protected readonly prisma: PrismaService,
     private readonly crypto: CryptoService,
@@ -65,7 +64,7 @@ export class AdminService
         console.log('Super admin created successfully');
       }
     } catch (error) {
-      throw new InternalServerErrorException('Error on creaeting super admin');
+      throw new InternalServerErrorException('Error on creaeting super admin', error.message);
     }
   }
 
