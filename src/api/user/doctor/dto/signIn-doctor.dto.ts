@@ -6,9 +6,9 @@ import {
   IsStrongPassword,
   MinLength,
 } from 'class-validator';
-import { CreateDoctorDto } from './create-doctor.dto';
+import { RegisterDoctorDto } from './register-doctor.dto';
 
-export class SignInDoctorDto extends PickType(CreateDoctorDto, ['phoneNumber']) {
+export class SignInDoctorDto extends PickType(RegisterDoctorDto, ['phoneNumber']) {
   @ApiProperty({
     type: 'string',
     description: 'Phone number for doctor',

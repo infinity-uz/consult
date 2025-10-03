@@ -3,6 +3,7 @@ import {
   ConflictException,
   ForbiddenException,
   Injectable,
+  NotFoundException,
   RequestMethod,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -13,9 +14,12 @@ import { IToken } from 'src/infrastructure/token/interface';
 import { TokenService } from 'src/infrastructure/token/Token';
 import { PrismaClient } from 'generated/prisma';
 import { PrismaService } from 'src/core/prisma.service';
-import { ConfirmPhoneNumberDto } from 'src/common/dto/registerPhoneNumber-doctor.dto';
+import {
+  ConfirmPhoneNumberDto,
+  TypeRequest,
+} from 'src/common/dto/registerPhoneNumber-doctor.dto';
 import { RedisService } from 'src/core/redis/redis.service';
-import { ConfirmOtpDto } from 'src/common/dto/confirmOtp-doctor.dto';
+import { ConfirmOtpDto, OTPRoles } from 'src/common/dto/confirmOtp.dto';
 
 @Injectable()
 export class AuthService {
@@ -78,43 +82,98 @@ export class AuthService {
     return successRes({});
   }
 
-  generateOtp(length = 6): string {
+  async generateOtp(phoneNumber: string, length = 6): Promise<string> {
     let otp = '';
     for (let i = 0; i < length; i++) {
       otp += Math.floor(Math.random() * 10);
     }
 
+    await this.redis.set(phoneNumber, otp, 5);
+
     return otp;
   }
 
-  async sendOTP(model: keyof PrismaClient, dto: ConfirmPhoneNumberDto) {
-    const { phoneNumber } = dto;
-    const exists = await (this.prisma[model] as any).findUnique({
+  async sendOTP(dto: ConfirmPhoneNumberDto) {
+    const { phoneNumber, model, type } = dto;
+
+    if (type == TypeRequest.REGISTR) {
+      const exists = await (this.prisma[model] as any).findUnique({
+        where: { phoneNumber },
+      });
+
+      if (exists) throw new ConflictException(`Phone number already exists`);
+
+      const data = await this.redis.get<string>(phoneNumber);
+
+      if (data)
+        throw new ConflictException(
+          `You can only send an OTP once in 5 minutes`,
+        );
+
+      const otp = await this.generateOtp(phoneNumber);
+      return successRes({
+        url: `api/v1/auth/confirmOTP`,
+        otp,
+        requestMethod: 'POST',
+      });
+    }
+
+    if (type == TypeRequest.SIGNIN) {
+      const exists = await (this.prisma[model] as any).findUnique({
+        where: { phoneNumber, isActive: true, isDeleted: false },
+      });
+      if (!exists)
+        throw new NotFoundException(
+          `No active ${model} found for this phone number.`,
+        );
+
+      const data = await this.redis.get<string>(phoneNumber);
+
+      if (data)
+        throw new ConflictException(
+          `You can only send an OTP once in 5 minutes`,
+        );
+
+      const otp = await this.generateOtp(phoneNumber);
+      return successRes({
+        url: `api/v1/auth/confirmOTP`,
+        otp,
+        requestMethod: 'POST',
+      });
+    }
+  }
+
+  async confirmOtp(res: Response, dto: ConfirmOtpDto) {
+    const { otp, phoneNumber, model } = dto;
+    const data = await this.redis.get<string>(phoneNumber);
+
+    if (!data) throw new BadRequestException('otp expired');
+
+    if (otp !== data) {
+      throw new BadRequestException('otp expired or incorect');
+    }
+    await this.redis.del(phoneNumber);
+
+    const user = await (this.prisma[model] as any).findUnique({
       where: { phoneNumber },
     });
 
-    if (exists) throw new ConflictException(`Phone number alreadey exists`);
-
-    const otp = this.generateOtp();
-    await this.redis.set(phoneNumber, otp, 5);
-
-    return successRes({
-      url: `api/v1/${String(model)}/confirmOTP`,
-      otp,
-      requestMethod: 'POST',
-    });
-  }
-
-  async confirmOtp(model: string, dto: ConfirmOtpDto) {
-    const { otp, phoneNumber } = dto;
-    const data = await this.redis.get<string>(phoneNumber);
-
-    if (!data) throw new BadRequestException('otp expired') as any;
-
-    if (otp == data) {
-      await this.redis.del(phoneNumber);
-      return { message: 'success', statusCode: 200 };
+    if (!user) {
+      return successRes({ url: `api/v1/${model}/registr` });
+    } else if (user.isActive === false || user.isDeleted == true) {
+      throw new ForbiddenException(`${model.toUpperCase()} isn't active`);
     }
-    throw new BadRequestException('otp expired or incorect');
+
+    const payload: IToken = {
+      id: user.id,
+      isActive: user.isActive,
+      role: user.role,
+    };
+
+    const accessToken = await this.jwt.accessToken(payload);
+    const refreshToken = await this.jwt.refreshToken(payload);
+    await this.jwt.writeCookie(res, `${model}Token`, refreshToken, 15);
+
+    return successRes({ token: accessToken });
   }
 }

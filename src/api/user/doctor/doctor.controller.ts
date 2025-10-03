@@ -9,133 +9,62 @@ import {
   HttpStatus,
   Res,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { DoctorService } from './doctor.service';
-import { CreateDoctorDto } from './dto/create-doctor.dto';
 import { UpdateDoctorDto } from './dto/update-doctor.dto';
-import { ConfirmPhoneNumberDto } from 'src/common/dto/registerPhoneNumber-doctor.dto';
 import { AuthService } from '../auth/auth.service';
-import { ConfirmOtpDto } from 'src/common/dto/confirmOtp-doctor.dto';
 import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { AccessRoles } from 'src/common/decorator/roles.decorator';
 import { CookieGetter } from 'src/common/decorator/cookie-getter.decorator';
 import { Roles } from 'src/common/enum/Roles.enum';
 import { type Response } from 'express';
-import { forGetOTPData } from 'src/common/document/forgetOTPData';
 import { PaginationQueryDto } from 'src/common/dto/query-pagination.dto';
 import { softDeleteDto } from 'src/common/dto/soft-delete.dto';
-import { SignInDoctorDto } from './dto/signIn-doctor.dto';
 import { GetRequestUser } from 'src/common/decorator/get-request-user.decorator';
 import { type IToken } from 'src/infrastructure/token/interface';
+import { RegisterDoctorDto } from './dto/register-doctor.dto';
+import { AuthGuard } from 'src/common/guard/auth.guard';
+import { RolesGuard } from 'src/common/guard/roles.guard';
 
+@UseGuards(AuthGuard, RolesGuard)
 @Controller('doctor')
 export class DoctorController {
   constructor(
     private readonly doctorService: DoctorService,
     private readonly authService: AuthService,
   ) {}
-
-  // -------------- FOR GET OTP ---------------
+  // ------------------- REGISTER -------------------
   @ApiOperation({
-    summary: 'Send otp to phone number',
+    summary: 'Register',
   })
   @ApiResponse({
     status: HttpStatus.OK,
-    description: 'OTP sending to phone number successfully',
+    description: 'function for doctor',
     schema: {
       example: {
         statusCode: 200,
         message: 'success',
-        data: forGetOTPData,
+        data: {},
       },
     },
   })
   @ApiResponse({
-    status: HttpStatus.NOT_FOUND,
-    description: 'Failed sending otp to phone number',
+    status: HttpStatus.CONFLICT,
+    description: 'Error during registration',
     schema: {
       example: {
-        statusCode: 404,
+        statusCode: 409,
         error: {
-          message: 'Phone number not fond',
-        },
-      },
-    },
-  })
-  @AccessRoles()
-  @Post('forGetOTP')
-  forGerPassword(@Body() dto: ConfirmPhoneNumberDto) {
-    return this.authService.sendOTP('doctor', dto);
-  }
-
-  // ---------------- CONFIRM OTP ----------------
-
-  @ApiOperation({
-    summary: 'Confirm otp',
-  })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'OTP confirmed successfully',
-    schema: {
-      example: {
-        statusCode: 200,
-        message: 'success',
-        data: {
-          message: 'success',
-        },
-      },
-    },
-  })
-  @ApiResponse({
-    status: HttpStatus.BAD_REQUEST,
-    description: 'Failed in confirmation otp',
-    schema: {
-      example: {
-        statusCode: 400,
-        error: {
-          message: 'OTP incorect or expired',
-        },
-      },
-    },
-  })
-  @AccessRoles(Roles.SUPERADMIN, 'ID')
-  @Post('confirmOTP')
-  confirmOTP(@Body() dto: ConfirmOtpDto) {
-    return this.authService.confirmOtp('doctor', dto);
-  }
-
-  // ------------------- SIGNIN -------------------
-  @ApiOperation({ summary: 'Sign in doctor' })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'Doctor signed successfully',
-    schema: {
-      example: {
-        statusCode: 201,
-        message: 'success',
-        data: [],
-      },
-    },
-  })
-  @ApiResponse({
-    status: HttpStatus.NOT_FOUND,
-    description: 'Failed signin doctor',
-    schema: {
-      example: {
-        statusCode: 400,
-        error: {
-          message: 'No doctor found for this number',
+          message: 'Phone number already exists',
         },
       },
     },
   })
   @AccessRoles('public')
-  @Post('signin')
-  signin(
-    @Body() signInDto: SignInDoctorDto,
-    @Res({ passthrough: true }) res: Response,
-  ) {
-    return this.doctorService.signIn(signInDto, res);
+  @Post('register')
+  register(@Body() dto: RegisterDoctorDto) {
+    return this.doctorService.registerDoctor(dto);
   }
 
   // ---------------- NEW TOKEN ----------------
@@ -209,11 +138,6 @@ export class DoctorController {
     return this.authService.signOut('doctor', token, res, 'doctorToken');
   }
 
-  // @Post('registr')
-  // create(@Body() createDoctorDto: CreateDoctorDto) {
-  //   return this.doctorService.create(createDoctorDto);
-  // }
-
   // ----------- FIND ALL WITH PAGINATION -----------
   @ApiOperation({ summary: 'Find all doctors with pagination' })
   @ApiResponse({
@@ -239,7 +163,7 @@ export class DoctorController {
       },
     },
   })
-  @AccessRoles(Roles.SUPERADMIN)
+  @AccessRoles(Roles.SUPERADMIN, Roles.ADMIN)
   @Get()
   @ApiBearerAuth()
   async findAllWithPagination(@Query() query: PaginationQueryDto) {
@@ -255,6 +179,9 @@ export class DoctorController {
       page: query.page,
       pageSize: query.pageSize,
       orderBy: { createdAt: 'desc' },
+      relations: {
+        services: true,
+      },
     });
   }
 
@@ -283,7 +210,7 @@ export class DoctorController {
       },
     },
   })
-  @AccessRoles(Roles.SUPERADMIN)
+  @AccessRoles(Roles.SUPERADMIN, Roles.ADMIN)
   @Get('all')
   @ApiBearerAuth()
   findAll() {
@@ -317,50 +244,49 @@ export class DoctorController {
       },
     },
   })
-  @AccessRoles(Roles.SUPERADMIN, 'ID')
+  @AccessRoles(Roles.SUPERADMIN, Roles.ADMIN, 'ID')
   @Get(':id')
   @ApiBearerAuth()
   findbyId(@Param('id') id: number) {
     return this.doctorService.findOneById(id);
   }
 
-   // ------------------- UPDATE -------------------
-    @ApiOperation({ summary: 'Updating doctor' })
-    @ApiResponse({
-      status: HttpStatus.OK,
-      description: 'Updating doctor',
-      schema: {
-        example: {
-          statusCode: 200,
-          message: 'success',
-          data: {},
+  // ------------------- UPDATE -------------------
+  @ApiOperation({ summary: 'Updating doctor' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Updating doctor',
+    schema: {
+      example: {
+        statusCode: 200,
+        message: 'success',
+        data: {},
+      },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Failed updating doctor',
+    schema: {
+      example: {
+        statusCode: 404,
+        error: {
+          message: 'Not found',
         },
       },
-    })
-    @ApiResponse({
-      status: HttpStatus.NOT_FOUND,
-      description: 'Failed updating doctor',
-      schema: {
-        example: {
-          statusCode: 404,
-          error: {
-            message: 'Not found',
-          },
-        },
-      },
-    })
-    @AccessRoles(Roles.SUPERADMIN, 'ID')
-    @Patch(':id')
-    @ApiBearerAuth()
-    update(
-      @Param('id') id: number,
-      @Body() dto: UpdateDoctorDto,
-      @GetRequestUser('user') user: IToken,
-    ) {
-      console.log(id);
-      return this.doctorService.updateDoctor(+id, dto, user);
-    }
-
+    },
+  })
+  @AccessRoles(Roles.SUPERADMIN, Roles.ADMIN, 'ID')
+  @Patch(':id')
+  @ApiBearerAuth()
+  update(
+    @Param('id') id: number,
+    @Body() dto: UpdateDoctorDto,
+    @GetRequestUser('user') user: IToken,
+  ) {
+    console.log(id);
+    return this.doctorService.updateDoctor(+id, dto, user);
+  }
 
   // --------------- SOFT DELETE ------------------
   @ApiOperation({ summary: 'Soft delete doctor' })
@@ -387,7 +313,7 @@ export class DoctorController {
       },
     },
   })
-  @AccessRoles(Roles.SUPERADMIN)
+  @AccessRoles(Roles.SUPERADMIN, Roles.ADMIN)
   @Patch('softDelete:id')
   @ApiBearerAuth()
   softDelete(@Param('id') id: number, @Body() dto: softDeleteDto) {

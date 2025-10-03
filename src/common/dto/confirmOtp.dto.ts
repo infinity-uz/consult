@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
+  IsEnum,
   IsNotEmpty,
   IsPhoneNumber,
   IsString,
@@ -7,6 +8,10 @@ import {
   Matches,
 } from 'class-validator';
 
+export enum OTPRoles {
+  DOCTOR = 'doctor',
+  PATEINTS = 'pateints',
+}
 export class ConfirmOtpDto {
   @ApiProperty({
     type: 'string',
@@ -27,4 +32,13 @@ export class ConfirmOtpDto {
   @Matches(/^\d{6}$/, { message: 'OTP must be 6 digits' })
   @IsNotEmpty()
   otp: string;
+
+  @ApiProperty({
+    enum: OTPRoles,
+    description: 'Roles of users',
+    example: OTPRoles.DOCTOR,
+  })
+  @IsEnum(OTPRoles)
+  @IsNotEmpty()
+  model: OTPRoles;
 }

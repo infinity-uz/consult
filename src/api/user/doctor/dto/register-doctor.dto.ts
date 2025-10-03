@@ -13,7 +13,7 @@ import {
 import { Type } from 'class-transformer';
 import { Gender } from 'src/common/enum/gender.enum';
 
-export class CreateDoctorDto {
+export class RegisterDoctorDto {
   @ApiProperty({
     type: 'string',
     description: 'First name for doctor',

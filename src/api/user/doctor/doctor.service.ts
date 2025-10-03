@@ -1,64 +1,57 @@
 import {
-  BadRequestException,
   ConflictException,
-  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { CreateDoctorDto } from './dto/create-doctor.dto';
+import { Doctor } from 'generated/prisma';
+
 import { UpdateDoctorDto } from './dto/update-doctor.dto';
 import { BaseService } from 'src/infrastructure/base/base.service';
-import { Doctor } from 'generated/prisma';
 import { PrismaService } from 'src/core/prisma.service';
-import { CryptoService } from 'src/infrastructure/crypto/Crypto';
-import { TokenService } from 'src/infrastructure/token/Token';
-import { AuthService } from '../auth/auth.service';
 import { successRes } from 'src/infrastructure/response/success';
 import { ISuccess } from 'src/infrastructure/response/success.interface';
 import { softDeleteDto } from 'src/common/dto/soft-delete.dto';
-import { SignInDoctorDto } from './dto/signIn-doctor.dto';
 import { IToken } from 'src/infrastructure/token/interface';
-import { Response } from 'express';
 import { Roles } from 'src/common/enum/Roles.enum';
+import { RegisterDoctorDto } from './dto/register-doctor.dto';
 
 @Injectable()
 export class DoctorService extends BaseService<
-  CreateDoctorDto,
+  RegisterDoctorDto,
   UpdateDoctorDto,
   Doctor
 > {
-  constructor(
-    protected readonly prisma: PrismaService,
-    private readonly crypto: CryptoService,
-    private readonly jwt: TokenService,
-    private readonly authService: AuthService,
-  ) {
+  constructor(protected readonly prisma: PrismaService) {
     super(prisma, prisma.doctor);
   }
 
-  async signIn(dto: SignInDoctorDto, res: Response): Promise<ISuccess> {
-    const { phoneNumber, password } = dto;
-    const doctor = await this.prisma.doctor.findUnique({
-      where: { phoneNumber },
+  async registerDoctor(dto: RegisterDoctorDto) {
+    const exists = await this.prisma.doctor.findUnique({
+      where: { phoneNumber: dto.phoneNumber },
+    });
+    if (exists) {
+      throw new ConflictException(
+        'Doctor with this phone number already exists',
+      );
+    }
+    
+    const existsService = await this.prisma.service.findUnique({
+      where: { id: dto.servicesId },
+    });
+    if (!existsService) {
+      throw new NotFoundException('Service not found');
+    }
+
+    const newDoctor = await this.prisma.doctor.create({
+      data: dto,
     });
 
-    if (!doctor) {
-      throw new NotFoundException('No doctor found for this number');
-    }
-
-    if (doctor.isActive === true || doctor.isDeleted === true) {
-      throw new ForbiddenException('This user is not active');
-    }
-    const payload: IToken = {
-      id: doctor.id,
-      isActive: true,
-      role: doctor.role,
-    };
-    const accessToken = await this.jwt.accessToken(payload);
-    const refreshToken = await this.jwt.refreshToken(payload);
-    await this.jwt.writeCookie(res, 'doctorToken', refreshToken, 15);
-
-    return successRes({ token: accessToken });
+    return successRes(
+      {
+        data: newDoctor,
+      },
+      201,
+    );
   }
 
   async updateDoctor(
@@ -80,13 +73,9 @@ export class DoctorService extends BaseService<
       if (existsService) throw new NotFoundException('Services not found');
     }
 
-    if (user.role !== Roles.SUPERADMIN) {
-      if (phoneNumber) {
-        delete dto.phoneNumber;
-      }
-      if (typeof isActive === 'boolean') {
-        delete dto.isActive;
-      }
+    if (![Roles.SUPERADMIN, Roles.ADMIN].includes(user.role as Roles)) {
+      delete dto.phoneNumber;
+      delete dto.isActive;
     }
 
     if (phoneNumber) {
@@ -103,7 +92,9 @@ export class DoctorService extends BaseService<
       data: dto,
     });
 
-    const updatingDoctor = await this.prisma.admin.findUnique({ where: { id } });
+    const updatingDoctor = await this.prisma.admin.findUnique({
+      where: { id },
+    });
     return successRes(updatingDoctor, 200);
   }
 
