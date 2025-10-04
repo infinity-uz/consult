@@ -1,29 +1,26 @@
 import { ApiProperty, PickType } from '@nestjs/swagger';
-import { CreateAdminDto } from './create-admin.dto';
 import {
   IsNotEmpty,
+  IsPhoneNumber,
   IsString,
   IsStrongPassword,
   MinLength,
 } from 'class-validator';
+import { RegisterDoctorDto } from './register-doctor.dto';
 
-export class SignInDto extends PickType(CreateAdminDto, [
-  'username',
-  'password',
-]) {
+export class SignInDoctorDto extends PickType(RegisterDoctorDto, ['phoneNumber']) {
   @ApiProperty({
     type: 'string',
-    description: 'Username for admin',
-    example: 'Admin1',
+    description: 'Phone number for doctor',
+    example: '+998909876543',
   })
-  @MinLength(5)
-  @IsString()
   @IsNotEmpty()
-  username: string;
+  @IsPhoneNumber('UZ')
+  phoneNumber: string;
 
   @ApiProperty({
     type: 'string',
-    description: 'Password for admin',
+    description: 'Password for doctor',
     example: 'Admin123!',
   })
   @IsStrongPassword()

@@ -17,8 +17,7 @@ export interface IFindOptions<T, W = any> {
   where?: W;
   select?: Partial<Record<keyof T, boolean>>;
   relations?: Record<string, boolean>;
-  orderBy?:any
+  orderBy?: any;
   page?: number;
   pageSize?: number;
 }
-

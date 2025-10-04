@@ -20,7 +20,7 @@ type ConfigType = {
   };
   OPENAI_API_KEY: string;
   REDIS: {
-    REDIS_HOST: number;
+    REDIS_HOST: string;
     REDIS_PORT: number;
     REDIS_PASSWORD: string;
   };
@@ -44,7 +44,7 @@ export const config: ConfigType = {
   },
   OPENAI_API_KEY: String(process.env.OPENAI_API_KEY),
   REDIS: {
-    REDIS_HOST: Number(process.env.REDIS_HOST),
+    REDIS_HOST: String(process.env.REDIS_HOST),
     REDIS_PORT: Number(process.env.REDIS_PORT),
     REDIS_PASSWORD: String(process.env.REDIS_PASSWORD),
   },

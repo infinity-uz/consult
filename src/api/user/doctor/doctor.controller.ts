@@ -7,102 +7,64 @@ import {
   Param,
   Delete,
   HttpStatus,
-  Query,
   Res,
+  Query,
   UseGuards,
 } from '@nestjs/common';
-import { AdminService } from './admin.service';
-import { CreateAdminDto } from './dto/create-admin.dto';
-import { UpdateAdminDto } from './dto/update-admin.dto';
-import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { adminData } from 'src/common/document/adminData';
-import { PaginationQueryDto } from 'src/common/dto/query-pagination.dto';
-import { paginationData } from 'src/common/document/paginationData';
-import { type Response } from 'express';
-import { SignInDto } from './dto/signIn.dto';
-import { signInData } from 'src/common/document/signinData';
-import { AuthGuard } from 'src/common/guard/auth.guard';
-import { RolesGuard } from 'src/common/guard/roles.guard';
-import { AccessRoles } from 'src/common/decorator/roles.decorator';
-import { Roles } from 'src/common/enum/Roles.enum';
-import { CookieGetter } from 'src/common/decorator/cookie-getter.decorator';
+import { DoctorService } from './doctor.service';
+import { UpdateDoctorDto } from './dto/update-doctor.dto';
 import { AuthService } from '../auth/auth.service';
+import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { AccessRoles } from 'src/common/decorator/roles.decorator';
+import { CookieGetter } from 'src/common/decorator/cookie-getter.decorator';
+import { Roles } from 'src/common/enum/Roles.enum';
+import { type Response } from 'express';
+import { PaginationQueryDto } from 'src/common/dto/query-pagination.dto';
+import { softDeleteDto } from 'src/common/dto/soft-delete.dto';
 import { GetRequestUser } from 'src/common/decorator/get-request-user.decorator';
 import { type IToken } from 'src/infrastructure/token/interface';
-import { softDeleteDto } from 'src/common/dto/soft-delete.dto';
+import { RegisterDoctorDto } from './dto/register-doctor.dto';
+import { AuthGuard } from 'src/common/guard/auth.guard';
+import { RolesGuard } from 'src/common/guard/roles.guard';
 
 @UseGuards(AuthGuard, RolesGuard)
-@Controller('admin')
-export class AdminController {
+@Controller('doctor')
+export class DoctorController {
   constructor(
-    private readonly adminService: AdminService,
+    private readonly doctorService: DoctorService,
     private readonly authService: AuthService,
   ) {}
-
-  // ------------------- CREATE -------------------
-  @ApiOperation({ summary: 'Created admin' })
+  // ------------------- REGISTER -------------------
+  @ApiOperation({
+    summary: 'Register',
+  })
   @ApiResponse({
-    status: HttpStatus.CREATED,
-    description: 'Admin created',
+    status: HttpStatus.OK,
+    description: 'function for doctor',
     schema: {
       example: {
-        statusCode: 201,
+        statusCode: 200,
         message: 'success',
-        data: adminData,
+        data: {},
       },
     },
   })
   @ApiResponse({
     status: HttpStatus.CONFLICT,
-    description: 'Failed creating admin',
+    description: 'Error during registration',
     schema: {
       example: {
         statusCode: 409,
         error: {
-          message: 'Username already exists',
-        },
-      },
-    },
-  })
-  @AccessRoles(Roles.SUPERADMIN)
-  @Post()
-  @ApiBearerAuth()
-  create(@Body() createAdminDto: CreateAdminDto) {
-    return this.adminService.createAdmin(createAdminDto);
-  }
-
-  // ------------------- SIGNIN -------------------
-  @ApiOperation({ summary: 'Sign in admin' })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'Administrator signed successfully',
-    schema: {
-      example: {
-        statusCode: 201,
-        message: 'success',
-        data: signInData,
-      },
-    },
-  })
-  @ApiResponse({
-    status: HttpStatus.BAD_REQUEST,
-    description: 'Failed signin admin',
-    schema: {
-      example: {
-        statusCode: 400,
-        error: {
-          message: 'Username  or password incorect',
+          message: 'Phone number already exists',
         },
       },
     },
   })
   @AccessRoles('public')
-  @Post('signin')
-  signin(
-    @Body() signInDto: SignInDto,
-    @Res({ passthrough: true }) res: Response,
-  ) {
-    return this.adminService.signIn(signInDto, res);
+  @Post('register')
+  register(@Body() dto: RegisterDoctorDto) {
+    return this.doctorService.registerDoctor(dto);
   }
 
   // ---------------- NEW TOKEN ----------------
@@ -136,13 +98,13 @@ export class AdminController {
   })
   @AccessRoles(Roles.SUPERADMIN, 'ID')
   @Post('token')
-  @ApiBearerAuth()
-  newToken(@CookieGetter('adminToken') token: string) {
-    return this.authService.newToken('admin', token);
+  // @ApiBearerAuth()
+  newToken(@CookieGetter('doctorToken') token: string) {
+    return this.authService.newToken('doctor', token);
   }
 
   // ------------------- SIGNOUT -------------------
-  @ApiOperation({ summary: 'Sign out admin' })
+  @ApiOperation({ summary: 'Sign out doctor' })
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Administrator sign out successfully',
@@ -156,7 +118,7 @@ export class AdminController {
   })
   @ApiResponse({
     status: HttpStatus.UNAUTHORIZED,
-    description: 'Failed sign out admin',
+    description: 'Failed sign out doctor',
     schema: {
       example: {
         statusCode: 401,
@@ -166,32 +128,32 @@ export class AdminController {
       },
     },
   })
-  @AccessRoles(Roles.SUPERADMIN, Roles.ADMIN)
+  @AccessRoles(Roles.DOCTOR)
   @Post('signout')
   @ApiBearerAuth()
   signOut(
-    @CookieGetter('adminToken') token: string,
+    @CookieGetter('doctorToken') token: string,
     @Res({ passthrough: true }) res: Response,
   ) {
-    return this.authService.signOut('admin', token, res, 'adminToken');
+    return this.authService.signOut('doctor', token, res, 'doctorToken');
   }
 
   // ----------- FIND ALL WITH PAGINATION -----------
-  @ApiOperation({ summary: 'Find all admins with pagination' })
+  @ApiOperation({ summary: 'Find all doctors with pagination' })
   @ApiResponse({
     status: HttpStatus.OK,
-    description: 'All admins get successfully with pagination',
+    description: 'All doctors get successfully with pagination',
     schema: {
       example: {
         statusCode: 200,
         message: 'success',
-        data: paginationData,
+        data: {},
       },
     },
   })
   @ApiResponse({
     status: HttpStatus.INTERNAL_SERVER_ERROR,
-    description: 'Error on get admins',
+    description: 'Error on get doctors',
     schema: {
       example: {
         statusCode: 500,
@@ -201,11 +163,11 @@ export class AdminController {
       },
     },
   })
-  @AccessRoles(Roles.SUPERADMIN)
+  @AccessRoles(Roles.SUPERADMIN, Roles.ADMIN)
   @Get()
   @ApiBearerAuth()
   async findAllWithPagination(@Query() query: PaginationQueryDto) {
-    return this.adminService.findAllWithPagination({
+    return this.doctorService.findAllWithPagination({
       where: query.query
         ? {
             username: {
@@ -217,25 +179,28 @@ export class AdminController {
       page: query.page,
       pageSize: query.pageSize,
       orderBy: { createdAt: 'desc' },
+      relations: {
+        services: true,
+      },
     });
   }
 
   // ------------------- FIND ALL -------------------
-  @ApiOperation({ summary: 'Get all admins' })
+  @ApiOperation({ summary: 'Get all doctors' })
   @ApiResponse({
     status: HttpStatus.OK,
-    description: 'All admins get successfully ',
+    description: 'All doctors get successfully ',
     schema: {
       example: {
         statusCode: 200,
         message: 'success',
-        data: [adminData],
+        data: [],
       },
     },
   })
   @ApiResponse({
     status: HttpStatus.FORBIDDEN,
-    description: 'Failed get admins',
+    description: 'Failed get doctors',
     schema: {
       example: {
         statusCode: 403,
@@ -245,32 +210,31 @@ export class AdminController {
       },
     },
   })
-  @AccessRoles(Roles.SUPERADMIN)
+  @AccessRoles(Roles.SUPERADMIN, Roles.ADMIN)
   @Get('all')
   @ApiBearerAuth()
   findAll() {
-    return this.adminService.findAll({
-      where: { role: Roles.ADMIN },
+    return this.doctorService.findAll({
       orderBy: { createdAt: 'desc' },
     });
   }
 
   // ----------------- FIND BY ID -----------------
-  @ApiOperation({ summary: 'Get admin by id' })
+  @ApiOperation({ summary: 'Get doctor by id' })
   @ApiResponse({
     status: HttpStatus.OK,
-    description: 'Get admin by id successfully ',
+    description: 'Get doctor by id successfully ',
     schema: {
       example: {
         statusCode: 200,
         message: 'success',
-        data: adminData,
+        data: {},
       },
     },
   })
   @ApiResponse({
     status: HttpStatus.FORBIDDEN,
-    description: 'Failed get admin by id',
+    description: 'Failed get doctor by id',
     schema: {
       example: {
         statusCode: 403,
@@ -280,87 +244,18 @@ export class AdminController {
       },
     },
   })
-  @AccessRoles(Roles.SUPERADMIN, 'ID')
+  @AccessRoles(Roles.SUPERADMIN, Roles.ADMIN, 'ID')
   @Get(':id')
   @ApiBearerAuth()
   findbyId(@Param('id') id: number) {
-    return this.adminService.findOne(id);
-  }
-
-  // --------------- SOFT DELETE ------------------
-  @ApiOperation({ summary: 'Soft delete admin' })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'Soft delete admin',
-    schema: {
-      example: {
-        statusCode: 200,
-        message: 'success',
-        data: adminData,
-      },
-    },
-  })
-  @ApiResponse({
-    status: HttpStatus.NOT_FOUND,
-    description: 'Failed soft delete admin',
-    schema: {
-      example: {
-        statusCode: 404,
-        error: {
-          message: 'Not found',
-        },
-      },
-    },
-  })
-  @AccessRoles(Roles.SUPERADMIN)
-  @Patch('softDelete:id')
-  @ApiBearerAuth()
-  softDelete(@Param('id') id: number, @Body() dto: softDeleteDto) {
-    return this.adminService.softDelete(id, dto);
+    return this.doctorService.findOneById(id);
   }
 
   // ------------------- UPDATE -------------------
-  @ApiOperation({ summary: 'Updating admin' })
+  @ApiOperation({ summary: 'Updating doctor' })
   @ApiResponse({
     status: HttpStatus.OK,
-    description: 'Updating admin',
-    schema: {
-      example: {
-        statusCode: 200,
-        message: 'success',
-        data: adminData,
-      },
-    },
-  })
-  @ApiResponse({
-    status: HttpStatus.NOT_FOUND,
-    description: 'Failed updating admin',
-    schema: {
-      example: {
-        statusCode: 404,
-        error: {
-          message: 'Not found',
-        },
-      },
-    },
-  })
-  @AccessRoles(Roles.SUPERADMIN, 'ID')
-  @Patch(':id')
-  @ApiBearerAuth()
-  update(
-    @Param('id') id: number,
-    @Body() dto: UpdateAdminDto,
-    @GetRequestUser('user') user: IToken,
-  ) {
-    console.log(id);
-    return this.adminService.updateAdmin(+id, dto, user);
-  }
-
-  // ------------------- DELETE -------------------
-  @ApiOperation({ summary: 'Delete doctor' })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'Delete admin',
+    description: 'Updating doctor',
     schema: {
       example: {
         statusCode: 200,
@@ -371,7 +266,76 @@ export class AdminController {
   })
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
-    description: 'Failed delete admin',
+    description: 'Failed updating doctor',
+    schema: {
+      example: {
+        statusCode: 404,
+        error: {
+          message: 'Not found',
+        },
+      },
+    },
+  })
+  @AccessRoles(Roles.SUPERADMIN, Roles.ADMIN, 'ID')
+  @Patch(':id')
+  @ApiBearerAuth()
+  update(
+    @Param('id') id: number,
+    @Body() dto: UpdateDoctorDto,
+    @GetRequestUser('user') user: IToken,
+  ) {
+    console.log(id);
+    return this.doctorService.updateDoctor(+id, dto, user);
+  }
+
+  // --------------- SOFT DELETE ------------------
+  @ApiOperation({ summary: 'Soft delete doctor' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Soft delete doctor',
+    schema: {
+      example: {
+        statusCode: 200,
+        message: 'success',
+        data: {},
+      },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Failed soft delete doctor',
+    schema: {
+      example: {
+        statusCode: 404,
+        error: {
+          message: 'Not found',
+        },
+      },
+    },
+  })
+  @AccessRoles(Roles.SUPERADMIN, Roles.ADMIN)
+  @Patch('softDelete:id')
+  @ApiBearerAuth()
+  softDelete(@Param('id') id: number, @Body() dto: softDeleteDto) {
+    return this.doctorService.softDelete(id, dto);
+  }
+
+  // ------------------- DELETE -------------------
+  @ApiOperation({ summary: 'Delete doctor' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Delete doctor',
+    schema: {
+      example: {
+        statusCode: 200,
+        message: 'success',
+        data: {},
+      },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Failed delete doctor',
     schema: {
       example: {
         statusCode: 404,
@@ -385,6 +349,6 @@ export class AdminController {
   @Delete(':id')
   @ApiBearerAuth()
   delete(@Param('id') id: number) {
-    return this.adminService.remove(id);
+    return this.doctorService.delete(id);
   }
 }
