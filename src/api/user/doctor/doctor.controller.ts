@@ -96,7 +96,7 @@ export class DoctorController {
   })
   @AccessRoles(Roles.SUPERADMIN, 'ID')
   @Post('token')
-  // @ApiBearerAuth()
+  @ApiBearerAuth()
   newToken(@CookieGetter('doctorToken') token: string) {
     return this.authService.newToken('doctor', token);
   }
