@@ -7,6 +7,7 @@ import { PrismaModule } from 'src/core/prisma.module';
 import { DoctorModule } from './user/doctor/doctor.module';
 import { RedisModule } from 'src/core/redis/redis.module';
 import { AuthModule } from './user/auth/auth.module';
+import { PateintModule } from './user/pateint/pateint.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { AuthModule } from './user/auth/auth.module';
     DoctorModule,
     AuthModule,
     ChatModule,
+    PateintModule,
 
   ],
   controllers: [],
