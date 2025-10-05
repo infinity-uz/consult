@@ -8,6 +8,6 @@ import { TokenService } from 'src/infrastructure/token/Token';
 @Module({
   imports:[AuthModule],
   controllers: [DoctorController],
-  providers: [DoctorService, CryptoService, TokenService ],
+  providers: [DoctorService ],
 })
 export class DoctorModule {}

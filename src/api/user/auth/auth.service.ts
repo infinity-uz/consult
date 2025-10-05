@@ -69,7 +69,6 @@ export class AuthService {
     if (!data) {
       throw new UnauthorizedException('Refresh token expired');
     }
-    console.log(model);
 
     const user = await (this.prisma[model] as any).findUnique({
       where: { id: data?.id },
@@ -107,7 +106,7 @@ export class AuthService {
 
       if (data)
         throw new ConflictException(
-          `You can only send an OTP once in 5 minutes`,
+          `You got a one-time code`,
         );
 
       const otp = await this.generateOtp(phoneNumber);

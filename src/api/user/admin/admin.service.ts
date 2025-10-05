@@ -27,7 +27,8 @@ import { softDeleteDto } from 'src/common/dto/soft-delete.dto';
 @Injectable()
 export class AdminService
   extends BaseService<CreateAdminDto, UpdateAdminDto, Admin>
-  implements OnModuleInit {
+  implements OnModuleInit
+{
   constructor(
     protected readonly prisma: PrismaService,
     private readonly crypto: CryptoService,
@@ -64,7 +65,10 @@ export class AdminService
         console.log('Super admin created successfully');
       }
     } catch (error) {
-      throw new InternalServerErrorException('Error on creaeting super admin', error.message);
+      throw new InternalServerErrorException(
+        'Error on creaeting super admin',
+        error.message,
+      );
     }
   }
 
@@ -130,18 +134,17 @@ export class AdminService
     if (data.role! == Roles.SUPERADMIN)
       throw new BadRequestException(`can't delete super admin`);
 
-    await this.prisma.admin.update({
-      where: { id },
-      data: { isDeleted: dto.isDeleted },
-    });
-
-    let timeDeleted: any = null;
-    if (dto.isDeleted) {
+    let timeDeleted = data.timeDeleted;
+    if (dto.isDeleted === true) {
       timeDeleted = new Date();
+    } else if (dto.isDeleted === false) {
+      timeDeleted = null;
     }
 
-    await this.prisma.admin.update({ where: { id }, data: { timeDeleted } });
-    const deleteData = await this.prisma.admin.findUnique({ where: { id } });
+    const deleteData = await this.prisma.admin.update({
+      where: { id },
+      data: { ...dto, timeDeleted },
+    });
 
     return successRes(deleteData, 200);
   }
@@ -151,7 +154,7 @@ export class AdminService
     updateAdminDto: UpdateAdminDto,
     user: IToken,
   ): Promise<ISuccess> {
-    const { username, password, isActive } = updateAdminDto;
+    const { username, password} = updateAdminDto;
 
     const admin = await this.prisma.admin.findUnique({ where: { id } });
     if (!admin) {
@@ -177,17 +180,13 @@ export class AdminService
       if (password) {
         data.hashedPassword = await this.crypto.encrypt(password);
       }
-      if (typeof isActive === 'boolean') {
-        data.isActive = isActive;
-      }
     }
 
-    await this.prisma.admin.update({
+    const updatingAdmin = await this.prisma.admin.update({
       where: { id },
       data,
     });
 
-    const updatingAdmin = await this.prisma.admin.findUnique({ where: { id } });
     return successRes(updatingAdmin, 200);
   }
 

@@ -352,7 +352,6 @@ export class AdminController {
     @Body() dto: UpdateAdminDto,
     @GetRequestUser('user') user: IToken,
   ) {
-    console.log(id);
     return this.adminService.updateAdmin(+id, dto, user);
   }
 

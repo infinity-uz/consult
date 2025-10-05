@@ -1,4 +1,4 @@
-import { Body, Controller, HttpStatus, Post } from '@nestjs/common';
+import { Body, Controller, HttpStatus, Post, Res } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { ConfirmPhoneNumberDto } from 'src/common/dto/registerPhoneNumber-doctor.dto';
 import { type Response } from 'express';
@@ -65,7 +65,7 @@ export class AuthController {
     },
   })
   @Post('confirOTP')
-  confirmOTP(@Body() dto: ConfirmOtpDto, res: Response) {
+  confirmOTP(@Body() dto: ConfirmOtpDto, @Res({passthrough:true}) res: Response) {
     return this.authService.confirmOtp(res, dto);
   }
 }
