@@ -9,6 +9,7 @@ import { RedisModule } from 'src/core/redis/redis.module';
 import { AuthModule } from './user/auth/auth.module';
 import { PateintModule } from './user/pateint/pateint.module';
 import { WalletModule } from './post/wallet/wallet.module';
+import { ChatModule } from './post/chat/chat.module';
 
 @Module({
   imports: [

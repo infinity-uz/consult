@@ -3,7 +3,7 @@ import { IsEnum, IsInt, IsNotEmpty, IsOptional, IsString } from "class-validator
 import { ChatRating, Role } from "generated/prisma";
 
 
-export class CreateChatDto {
+export class CreateReviewDto {
 
     @ApiProperty()
     @IsNotEmpty()
@@ -15,4 +15,8 @@ export class CreateChatDto {
     @IsInt()
     userId: number;
 
+    @ApiProperty()
+    @IsNotEmpty()
+    @IsEnum(ChatRating)
+    rating: ChatRating;
 }

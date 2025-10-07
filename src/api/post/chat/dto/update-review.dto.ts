@@ -1,12 +1,16 @@
 import { ApiProperty, PartialType } from '@nestjs/swagger';
-import { CreateChatDto } from './create-chat.dto';
 import { IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { ChatRating } from 'generated/prisma';
 
-export class UpdateChatDto {
+export class UpdateReviewDto {
 
     @ApiProperty()
     @IsOptional()
     @IsString()
     comments: string;
+
+    @ApiProperty()
+    @IsNotEmpty()
+    @IsEnum(ChatRating)
+    rating: ChatRating;
 }
