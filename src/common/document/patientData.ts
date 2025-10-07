@@ -1,0 +1,15 @@
+export const patientData = {
+  id: 2,
+  createdAt: '2025-10-05T12:07:16.816Z',
+  updatedAt: '2025-10-05T12:07:16.816Z',
+  isDeleted: false,
+  timeDeleted: null,
+  firstName: 'Toshmat',
+  lastName: 'Toshmatov',
+  phoneNumber: '+998909876543',
+  gender: 'MALE',
+  age: 30,
+  location: 'Tashkent',
+  isActive: true,
+  role: 'PATEINTS',
+};
