@@ -14,12 +14,13 @@ import { IToken } from 'src/infrastructure/token/interface';
 import { TokenService } from 'src/infrastructure/token/Token';
 import { PrismaClient } from 'generated/prisma';
 import { PrismaService } from 'src/core/prisma.service';
+import { RedisService } from 'src/core/redis/redis.service';
 import {
   ConfirmPhoneNumberDto,
   TypeRequest,
-} from 'src/common/dto/registerPhoneNumber-doctor.dto';
-import { RedisService } from 'src/core/redis/redis.service';
-import { ConfirmOtpDto, OTPRoles } from 'src/common/dto/confirmOtp.dto';
+} from './dto/registerPhoneNumber-doctor.dto';
+import { ConfirmOtpDto } from './dto/confirmOtp.dto';
+import { updatePhoneNumber } from './dto/updatePhoneNumber.dto';
 
 @Injectable()
 export class AuthService {
@@ -104,10 +105,7 @@ export class AuthService {
 
       const data = await this.redis.get<string>(phoneNumber);
 
-      if (data)
-        throw new ConflictException(
-          `You got a one-time code`,
-        );
+      if (data) throw new ConflictException(`You got a one-time code`);
 
       const otp = await this.generateOtp(phoneNumber);
       return successRes({
@@ -140,10 +138,24 @@ export class AuthService {
         requestMethod: 'POST',
       });
     }
+
+    if (type == TypeRequest.UPDATEPHNUMBER) {
+      const exists = await (this.prisma[model] as any).findUnique({
+        where: { phoneNumber },
+      });
+
+      if (exists) throw new ConflictException('Phone Number already exsists');
+
+      const otp = await this.generateOtp(phoneNumber);
+      return successRes({
+        url: `api/v1/auth/confirmOTP`,
+        otp,
+        requestMethod: 'POST',
+      });
+    }
   }
 
-  async confirmOtp(res: Response, dto: ConfirmOtpDto) {
-    const { otp, phoneNumber, model } = dto;
+  async verifyOtp(phoneNumber: string, otp: string) {
     const data = await this.redis.get<string>(phoneNumber);
 
     if (!data) throw new BadRequestException('otp expired');
@@ -151,6 +163,12 @@ export class AuthService {
     if (otp !== data) {
       throw new BadRequestException('otp expired or incorect');
     }
+  }
+  async confirmOtp(res: Response, dto: ConfirmOtpDto) {
+    const { otp, phoneNumber, model } = dto;
+
+    await this.verifyOtp(phoneNumber, otp);
+
     await this.redis.del(phoneNumber);
 
     const user = await (this.prisma[model] as any).findUnique({
@@ -174,5 +192,18 @@ export class AuthService {
     await this.jwt.writeCookie(res, `${model}Token`, refreshToken, 15);
 
     return successRes({ token: accessToken });
+  }
+
+  async updatePhoneNumber(id: number, dto: updatePhoneNumber) {
+    const { model, otp, phoneNumber } = dto;
+    await this.verifyOtp(phoneNumber, otp);
+    await this.redis.del(phoneNumber);
+
+    const updatingUser = await (this.prisma[model] as any).update({
+      where: { id },
+      data: { phoneNumber },
+    });
+
+    return successRes(updatingUser);
   }
 }

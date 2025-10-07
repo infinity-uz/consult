@@ -30,6 +30,7 @@ import { AuthService } from '../auth/auth.service';
 import { GetRequestUser } from 'src/common/decorator/get-request-user.decorator';
 import { type IToken } from 'src/infrastructure/token/interface';
 import { softDeleteDto } from 'src/common/dto/soft-delete.dto';
+import { SwaggerApi } from 'src/common/swagger/response.swagger';
 
 @UseGuards(AuthGuard, RolesGuard)
 @Controller('admin')
@@ -41,29 +42,14 @@ export class AdminController {
 
   // ------------------- CREATE -------------------
   @ApiOperation({ summary: 'Created admin' })
-  @ApiResponse({
-    status: HttpStatus.CREATED,
-    description: 'Admin created',
-    schema: {
-      example: {
-        statusCode: 201,
-        message: 'success',
-        data: adminData,
-      },
-    },
-  })
-  @ApiResponse({
-    status: HttpStatus.CONFLICT,
-    description: 'Failed creating admin',
-    schema: {
-      example: {
-        statusCode: 409,
-        error: {
-          message: 'Username already exists',
-        },
-      },
-    },
-  })
+  @ApiResponse(SwaggerApi.ApiSuccessResponse(adminData, HttpStatus.CREATED))
+  @ApiResponse(
+    SwaggerApi.ApiErrorResponse(
+      'Username already exists',
+      HttpStatus.CONFLICT,
+      409,
+    ),
+  )
   @AccessRoles(Roles.SUPERADMIN)
   @Post()
   @ApiBearerAuth()
@@ -73,29 +59,8 @@ export class AdminController {
 
   // ------------------- SIGNIN -------------------
   @ApiOperation({ summary: 'Sign in admin' })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'Administrator signed successfully',
-    schema: {
-      example: {
-        statusCode: 201,
-        message: 'success',
-        data: signInData,
-      },
-    },
-  })
-  @ApiResponse({
-    status: HttpStatus.BAD_REQUEST,
-    description: 'Failed signin admin',
-    schema: {
-      example: {
-        statusCode: 400,
-        error: {
-          message: 'Username  or password incorect',
-        },
-      },
-    },
-  })
+  @ApiResponse(SwaggerApi.ApiSuccessResponse(signInData))
+  @ApiResponse(SwaggerApi.ApiErrorResponse('Username or password encorect'))
   @AccessRoles('public')
   @Post('signin')
   signin(
@@ -109,31 +74,13 @@ export class AdminController {
   @ApiOperation({
     summary: 'Get new access token',
   })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'New access token get successfully',
-    schema: {
-      example: {
-        statusCode: 200,
-        message: 'success',
-        data: {
-          token: 'aslksfjo2i3n4n2309idsfn2i3jo423lj423kj',
-        },
+  @ApiResponse(
+    SwaggerApi.ApiSuccessResponse({
+      data: {
+        token: 'aslksfjo2i3n4n2309idsfn2i3jo423lj423kj',
       },
-    },
-  })
-  @ApiResponse({
-    status: HttpStatus.UNAUTHORIZED,
-    description: 'Unauthorized',
-    schema: {
-      example: {
-        statusCode: 400,
-        error: {
-          message: 'Refresh token expired',
-        },
-      },
-    },
-  })
+    }),
+  )
   @AccessRoles(Roles.SUPERADMIN, 'ID')
   @Post('token')
   @ApiBearerAuth()
@@ -143,29 +90,7 @@ export class AdminController {
 
   // ------------------- SIGNOUT -------------------
   @ApiOperation({ summary: 'Sign out admin' })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'Administrator sign out successfully',
-    schema: {
-      example: {
-        statusCode: 200,
-        message: 'success',
-        data: {},
-      },
-    },
-  })
-  @ApiResponse({
-    status: HttpStatus.UNAUTHORIZED,
-    description: 'Failed sign out admin',
-    schema: {
-      example: {
-        statusCode: 401,
-        error: {
-          message: 'Refresh token not found',
-        },
-      },
-    },
-  })
+  @ApiResponse(SwaggerApi.ApiSuccessResponse())
   @AccessRoles(Roles.SUPERADMIN, Roles.ADMIN)
   @Post('signout')
   @ApiBearerAuth()
@@ -178,29 +103,7 @@ export class AdminController {
 
   // ----------- FIND ALL WITH PAGINATION -----------
   @ApiOperation({ summary: 'Find all admins with pagination' })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'All admins get successfully with pagination',
-    schema: {
-      example: {
-        statusCode: 200,
-        message: 'success',
-        data: paginationData,
-      },
-    },
-  })
-  @ApiResponse({
-    status: HttpStatus.INTERNAL_SERVER_ERROR,
-    description: 'Error on get admins',
-    schema: {
-      example: {
-        statusCode: 500,
-        error: {
-          message: 'Internal server error',
-        },
-      },
-    },
-  })
+  @ApiResponse(SwaggerApi.ApiSuccessResponse(paginationData))
   @AccessRoles(Roles.SUPERADMIN)
   @Get()
   @ApiBearerAuth()
@@ -222,29 +125,7 @@ export class AdminController {
 
   // ------------------- FIND ALL -------------------
   @ApiOperation({ summary: 'Get all admins' })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'All admins get successfully ',
-    schema: {
-      example: {
-        statusCode: 200,
-        message: 'success',
-        data: [adminData],
-      },
-    },
-  })
-  @ApiResponse({
-    status: HttpStatus.FORBIDDEN,
-    description: 'Failed get admins',
-    schema: {
-      example: {
-        statusCode: 403,
-        error: {
-          message: 'Forbidden user',
-        },
-      },
-    },
-  })
+  @ApiResponse(SwaggerApi.ApiSuccessResponse([adminData]))
   @AccessRoles(Roles.SUPERADMIN)
   @Get('all')
   @ApiBearerAuth()
@@ -257,29 +138,10 @@ export class AdminController {
 
   // ----------------- FIND BY ID -----------------
   @ApiOperation({ summary: 'Get admin by id' })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'Get admin by id successfully ',
-    schema: {
-      example: {
-        statusCode: 200,
-        message: 'success',
-        data: adminData,
-      },
-    },
-  })
-  @ApiResponse({
-    status: HttpStatus.FORBIDDEN,
-    description: 'Failed get admin by id',
-    schema: {
-      example: {
-        statusCode: 403,
-        error: {
-          message: 'Forbidden user',
-        },
-      },
-    },
-  })
+  @ApiResponse(SwaggerApi.ApiSuccessResponse(adminData))
+  @ApiResponse(
+    SwaggerApi.ApiErrorResponse('Admin not found', HttpStatus.NOT_FOUND, 404),
+  )
   @AccessRoles(Roles.SUPERADMIN, 'ID')
   @Get(':id')
   @ApiBearerAuth()
@@ -289,29 +151,10 @@ export class AdminController {
 
   // --------------- SOFT DELETE ------------------
   @ApiOperation({ summary: 'Soft delete admin' })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'Soft delete admin',
-    schema: {
-      example: {
-        statusCode: 200,
-        message: 'success',
-        data: adminData,
-      },
-    },
-  })
-  @ApiResponse({
-    status: HttpStatus.NOT_FOUND,
-    description: 'Failed soft delete admin',
-    schema: {
-      example: {
-        statusCode: 404,
-        error: {
-          message: 'Not found',
-        },
-      },
-    },
-  })
+  @ApiResponse(SwaggerApi.ApiSuccessResponse(adminData))
+  @ApiResponse(
+    SwaggerApi.ApiErrorResponse('Admin not found', HttpStatus.NOT_FOUND, 404),
+  )
   @AccessRoles(Roles.SUPERADMIN)
   @Patch('softDelete:id')
   @ApiBearerAuth()
@@ -321,29 +164,10 @@ export class AdminController {
 
   // ------------------- UPDATE -------------------
   @ApiOperation({ summary: 'Updating admin' })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'Updating admin',
-    schema: {
-      example: {
-        statusCode: 200,
-        message: 'success',
-        data: adminData,
-      },
-    },
-  })
-  @ApiResponse({
-    status: HttpStatus.NOT_FOUND,
-    description: 'Failed updating admin',
-    schema: {
-      example: {
-        statusCode: 404,
-        error: {
-          message: 'Not found',
-        },
-      },
-    },
-  })
+  @ApiResponse(SwaggerApi.ApiSuccessResponse(adminData))
+  @ApiResponse(
+    SwaggerApi.ApiErrorResponse('Admin not found', HttpStatus.NOT_FOUND, 404),
+  )
   @AccessRoles(Roles.SUPERADMIN, 'ID')
   @Patch(':id')
   @ApiBearerAuth()
@@ -357,29 +181,10 @@ export class AdminController {
 
   // ------------------- DELETE -------------------
   @ApiOperation({ summary: 'Delete doctor' })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'Delete admin',
-    schema: {
-      example: {
-        statusCode: 200,
-        message: 'success',
-        data: {},
-      },
-    },
-  })
-  @ApiResponse({
-    status: HttpStatus.NOT_FOUND,
-    description: 'Failed delete admin',
-    schema: {
-      example: {
-        statusCode: 404,
-        error: {
-          message: 'Not found',
-        },
-      },
-    },
-  })
+  @ApiResponse(SwaggerApi.ApiSuccessResponse(adminData))
+  @ApiResponse(
+    SwaggerApi.ApiErrorResponse('Admin not found', HttpStatus.NOT_FOUND, 404),
+  )
   @AccessRoles(Roles.SUPERADMIN)
   @Delete(':id')
   @ApiBearerAuth()
