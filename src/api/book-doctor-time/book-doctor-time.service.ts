@@ -2,9 +2,6 @@ import { ConflictException, Injectable, NotFoundException } from '@nestjs/common
 import { CreateBookDoctorTimeDto } from './dto/create-book-doctor-time.dto';
 import { UpdateBookDoctorTimeDto } from './dto/update-book-doctor-time.dto';
 import { PrismaService } from 'src/core/prisma.service';
-import { dateTimestampProvider } from 'rxjs/internal/scheduler/dateTimestampProvider';
-import { timeoutProvider } from 'rxjs/internal/scheduler/timeoutProvider';
-import { utimes } from 'fs';
 
 @Injectable()
 export class BookDoctorTimeService {
@@ -16,6 +13,23 @@ export class BookDoctorTimeService {
     const doctor = await this.prisama.doctor.findMany({ where: { id: { in: doctorId } } })
     if (doctor.length !== doctorId.length) {
       throw new ConflictException("doctor id lardan biri topilmadi")
+    }
+
+
+    const { date, startTime, finishTime } = createBookDoctorTimeDto;
+
+    const conflict = await this.prisama.bookDoctorTime.findFirst({
+    where: {
+      doctor: { some: { id: { in: doctorId } } },
+      date:date,
+      OR: [
+        { startTime: { lte:finishTime }, finishTime: { gte: startTime } }
+        ]
+      }
+    });
+
+    if (conflict) {
+      throw new ConflictException("Bu vaqt oraligi allaqachon band qilingan");
     }
 
     const data = await this.prisama.bookDoctorTime.create({
