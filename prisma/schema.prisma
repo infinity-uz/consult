@@ -254,12 +254,13 @@ model BookDoctor {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   isDeleted   Boolean  @default(false)
-  timeDeleted DateTime
+  timeDeleted DateTime?
 
   bookDate String
   isActive Boolean          @default(true)
   status   BookDoctorStatus @default(PENDING)
   location String
+  notes    String?
 
   service      Service    @relation(fields: [serviceID], references: [id])
   serviceID    Int
@@ -279,7 +280,7 @@ model Payment {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   isDeleted   Boolean  @default(false)
-  timeDeleted DateTime
+  timeDeleted DateTime?
 
   status       PaymentStatus
   pateintsName String
@@ -287,6 +288,7 @@ model Payment {
   paymentType  PaymentType   @default(CARD)
   meetingDate  String
   description  String
+  amount       Float
 
   doctorBook   BookDoctor @relation(fields: [doctorBookId], references: [id])
   doctorBookId Int
