@@ -77,9 +77,9 @@ export class SpecialityController {
       },
     },
   })
-
+  @ApiBearerAuth()
+  @AccessRoles(Roles.SUPERADMIN, Roles.DOCTOR, Roles.ADMIN, Roles.PATEINTS)
   @Get()
-  
   async findAll(@Query() query: PaginationQueryDto) {
     return this.specialityService.findAllWithPagination({
       where: query.query
@@ -102,45 +102,46 @@ export class SpecialityController {
     status: HttpStatus.CREATED,
     description: 'Speciality Find successfully',
   })
+  @ApiBearerAuth()
+  @AccessRoles(Roles.SUPERADMIN, Roles.DOCTOR, Roles.ADMIN, Roles.PATEINTS)
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.specialityService.findOneById(+id);
   }
 
   // ----------- DELETE -----------
-@ApiOperation({ summary: 'Soft delete speciality' })
-@ApiResponse({
-  status: HttpStatus.OK,
-  description: 'Speciality deleted successfully',
-  schema: {
-    example: {
-      statusCode: 200,
-      message: 'success',
-      data: {
-        id: 1,
-        name: 'Pediatrics',
-        timeDeleted: '2025-10-01T12:00:00.000Z',
+  @ApiOperation({ summary: 'Soft delete speciality' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Speciality deleted successfully',
+    schema: {
+      example: {
+        statusCode: 200,
+        message: 'success',
+        data: {
+          id: 1,
+          name: 'Pediatrics',
+          timeDeleted: '2025-10-01T12:00:00.000Z',
+        },
       },
     },
-  },
-})
-@ApiResponse({
-  status: HttpStatus.NOT_FOUND,
-  description: 'Speciality not found',
-  schema: {
-    example: {
-      statusCode: 404,
-      error: {
-        message: 'Speciality with id 1 not found',
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Speciality not found',
+    schema: {
+      example: {
+        statusCode: 404,
+        error: {
+          message: 'Speciality with id 1 not found',
+        },
       },
     },
-  },
-})
-@AccessRoles(Roles.SUPERADMIN)
-@Delete(':id')
-@ApiBearerAuth()
-delete(@Param('id') id: string) {
-  return this.specialityService.delete(+id);
-}
-
+  })
+  @AccessRoles(Roles.SUPERADMIN)
+  @Delete(':id')
+  @ApiBearerAuth()
+  delete(@Param('id') id: string) {
+    return this.specialityService.delete(+id);
+  }
 }

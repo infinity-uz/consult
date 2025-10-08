@@ -17,7 +17,7 @@ import { ServiceModule } from './service/service.module';
     PrismaModule,
     AdminModule,
     SpecialityModule,
-    ServiceModule
+    ServiceModule,
   ],
   controllers: [],
   providers: [],
