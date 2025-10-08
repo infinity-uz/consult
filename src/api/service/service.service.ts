@@ -31,12 +31,7 @@ export class ServiceService extends BaseService<
       ...dto,
     };
 
-    if (dto.timeDeleted !== undefined) {
-      data.timeDeleted =
-        dto.timeDeleted instanceof Date
-          ? dto.timeDeleted
-          : new Date(dto.timeDeleted);
-    }
+    
 
     const service = await this.prisma.service.create({ data });
 

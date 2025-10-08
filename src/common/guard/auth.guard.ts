@@ -4,6 +4,7 @@ import {
   ForbiddenException,
   HttpException,
   Injectable,
+  InternalServerErrorException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
@@ -36,24 +37,17 @@ export class AuthGuard implements CanActivate {
     const token = auth.slice(7);
     try {
       const data = this.jwt.verify(token, { secret: config.TOKEN.ACCESS_KEY });
-      if (data?.isActive != true) {
-        throw new ForbiddenException('User is not active');
-      }
       req.user = data;
       return true;
-    } catch (error) {
-      const errorObject = {
-        statusCode: error?.response ? 403 : 401,
-        error: {
-          message: error?.response
-            ? error?.message
-            : 'Token expired or incorrect',
-        },
-      };
-      throw new HttpException(
-        errorObject.error.message,
-        errorObject.statusCode,
-      );
+    } catch (error: any) {
+      if (error.name === 'TokenExpiredError') {
+        throw new UnauthorizedException('Token expired');
+      } else if (error.name === 'JsonWebTokenError') {
+        throw new UnauthorizedException('Invalid token');
+      } else if (error instanceof UnauthorizedException) {
+        throw error;
+      }
+      throw new InternalServerErrorException('Unexpected error occurred');
     }
   }
 }

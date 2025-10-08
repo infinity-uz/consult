@@ -1,10 +1,12 @@
 import { Module } from '@nestjs/common';
-import { AdminModule } from './user/admin/admin.module';
-import { ConfigModule } from '@nestjs/config';
-import { PrismaModule } from 'src/core/prisma.module';
+import { ChatModule } from './post/chat/chat.module';
 import { JwtModule } from '@nestjs/jwt';
-import { SpecialityModule } from './speciality/speciality.module';
+import { ConfigModule } from '@nestjs/config';
+import { AdminModule } from './user/admin/admin.module';
+import { PrismaModule } from 'src/core/prisma.module';
 import { ServiceModule } from './service/service.module';
+import { SpecialityModule } from './speciality/speciality.module';
+
 
 @Module({
   imports: [
@@ -16,10 +18,9 @@ import { ServiceModule } from './service/service.module';
     }),
     PrismaModule,
     AdminModule,
-    SpecialityModule,
     ServiceModule,
+    SpecialityModule
   ],
   controllers: [],
-  providers: [],
 })
-export class AppModule {}
+export class AppModule { }

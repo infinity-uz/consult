@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsOptional, IsString, IsBoolean } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString, IsBoolean, IsNumber } from 'class-validator';
 
 export class CreateSpecialityDto {
   @ApiProperty({
@@ -10,16 +10,6 @@ export class CreateSpecialityDto {
   @IsString()
   @IsNotEmpty()
   name: string;
-
-  @ApiProperty({
-    type: 'boolean',
-    description: 'Speciality is active or not',
-    example: true,
-    required: false,
-  })
-  @IsOptional()
-  @IsBoolean()
-  isActive?: boolean;
 
   @ApiProperty({
     type: 'string',
