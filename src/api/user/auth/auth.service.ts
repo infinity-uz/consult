@@ -169,40 +169,42 @@ export class AuthService {
 
     await this.verifyOtp(phoneNumber, otp);
 
-    await this.redis.del(phoneNumber);
-
+    
     const user = await (this.prisma[model] as any).findUnique({
       where: { phoneNumber },
     });
-
+    
     if (!user) {
       return successRes({ url: `api/v1/${model}/registr` });
     } else if (user.isActive === false || user.isDeleted == true) {
       throw new ForbiddenException(`${model.toUpperCase()} isn't active`);
     }
-
+    
     const payload: IToken = {
       id: user.id,
       isActive: user.isActive,
       role: user.role,
     };
-
+    
     const accessToken = await this.jwt.accessToken(payload);
     const refreshToken = await this.jwt.refreshToken(payload);
     await this.jwt.writeCookie(res, `${model}Token`, refreshToken, 15);
-
+    
+    await this.redis.del(phoneNumber);
+    
     return successRes({ token: accessToken });
   }
 
   async updatePhoneNumber(id: number, dto: updatePhoneNumber) {
     const { model, otp, phoneNumber } = dto;
     await this.verifyOtp(phoneNumber, otp);
-    await this.redis.del(phoneNumber);
-
+    
     const updatingUser = await (this.prisma[model] as any).update({
       where: { id },
       data: { phoneNumber },
     });
+    
+    await this.redis.del(phoneNumber);
 
     return successRes(updatingUser);
   }
