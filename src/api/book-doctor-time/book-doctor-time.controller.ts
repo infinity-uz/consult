@@ -17,7 +17,7 @@ export class BookDoctorTimeController {
 
 
   @Post()
-  @ApiOperation({summary:"Yangi BookDoctortime yaratish",description:"doctor yoki admin"})
+  @ApiOperation({summary:"create BookDoctortime ",description:"doctor yoki admin"})
   @ApiResponse({
       status: HttpStatus.CREATED,
       description: 'bookDoctorTime created',
@@ -30,7 +30,7 @@ export class BookDoctorTimeController {
     })
   @ApiBearerAuth()
   @UseGuards(AuthGuard,RolesGuard)
-  @AccessRoles(Roles.ADMIN,Roles.DOCTOR)
+  @AccessRoles(Roles.ADMIN,Roles.DOCTOR, Roles.SUPERADMIN)
   create(@Body() createBookDoctorTimeDto: CreateBookDoctorTimeDto) {
     return this.bookDoctorTimeService.create(createBookDoctorTimeDto);
   }
@@ -60,7 +60,7 @@ export class BookDoctorTimeController {
   @ApiResponse({ status: 200, description: 'BookDoctorTime ni yangilash' })
   @ApiBearerAuth()
   @UseGuards(AuthGuard,RolesGuard)
-  @AccessRoles(Roles.ADMIN,Roles.DOCTOR)
+  @AccessRoles(Roles.ADMIN,Roles.DOCTOR, Roles.SUPERADMIN)
   update(@Param('id') id: string, @Body() updateBookDoctorTimeDto: UpdateBookDoctorTimeDto) {
     return this.bookDoctorTimeService.update(+id, updateBookDoctorTimeDto);
   }
@@ -69,10 +69,10 @@ export class BookDoctorTimeController {
 
 
   @Delete('soft/:id')
-  @ApiOperation({ summary: "BookDoctorTime ni ochirish soft-delete"})
+  @ApiOperation({ summary: "is delete BookDoctorTime  (soft-delete)"})
   @ApiBearerAuth()
   @UseGuards(AuthGuard,RolesGuard)
-  @AccessRoles(Roles.ADMIN,Roles.DOCTOR)
+  @AccessRoles(Roles.ADMIN,Roles.DOCTOR, Roles.SUPERADMIN)
   remove(@Param('id') id: string) {
     return this.bookDoctorTimeService.remove(+id);
   }
@@ -81,10 +81,10 @@ export class BookDoctorTimeController {
 
 
   @Delete(':id')
-  @ApiOperation({ summary: "BookDoctorTime ni ochirish  (hard-delete)"})
+  @ApiOperation({ summary: "is delete BookDoctorTime  (hard-delete)"})
   @ApiBearerAuth()
   @UseGuards(AuthGuard,RolesGuard)
-  @AccessRoles(Roles.ADMIN,Roles.DOCTOR)
+  @AccessRoles(Roles.ADMIN,Roles.DOCTOR, Roles.SUPERADMIN)
   delete(@Param('id') id: string) {
     return this.bookDoctorTimeService.delete(+id);
   }
