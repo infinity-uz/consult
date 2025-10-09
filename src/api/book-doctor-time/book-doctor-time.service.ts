@@ -2,6 +2,7 @@ import { ConflictException, Injectable, NotFoundException } from '@nestjs/common
 import { CreateBookDoctorTimeDto } from './dto/create-book-doctor-time.dto';
 import { UpdateBookDoctorTimeDto } from './dto/update-book-doctor-time.dto';
 import { PrismaService } from 'src/core/prisma.service';
+import { successRes } from 'src/infrastructure/response/success';
 
 @Injectable()
 export class BookDoctorTimeService {
@@ -9,7 +10,7 @@ export class BookDoctorTimeService {
 
   async create(createBookDoctorTimeDto: CreateBookDoctorTimeDto) {
     const { doctorId, ...rest } = createBookDoctorTimeDto;
-    
+
     const doctor = await this.prisama.doctor.findMany({ where: { id: { in: doctorId } } })
     if (doctor.length !== doctorId.length) {
       throw new ConflictException("doctor id lardan biri topilmadi")
@@ -19,11 +20,11 @@ export class BookDoctorTimeService {
     const { date, startTime, finishTime } = createBookDoctorTimeDto;
 
     const conflict = await this.prisama.bookDoctorTime.findFirst({
-    where: {
-      doctor: { some: { id: { in: doctorId } } },
-      date:date,
-      OR: [
-        { startTime: { lte:finishTime }, finishTime: { gte: startTime } }
+      where: {
+        doctor: { some: { id: { in: doctorId } } },
+        date: date,
+        OR: [
+          { startTime: { lte: finishTime }, finishTime: { gte: startTime } }
         ]
       }
     });
@@ -37,7 +38,7 @@ export class BookDoctorTimeService {
       include: { doctor: true }
 
     })
-    return data;
+    return successRes(data, 201);
 
   }
 
@@ -56,7 +57,7 @@ export class BookDoctorTimeService {
     if (!doctortime || doctortime.isDeleted) {
       throw new NotFoundException("bookDoctorTime id topilmadi")
     }
-    return doctortime
+    return successRes(doctortime, 200)
   }
 
   async update(id: number, updateBookDoctorTimeDto: UpdateBookDoctorTimeDto) {
@@ -72,25 +73,30 @@ export class BookDoctorTimeService {
       doctors = doctor
     }
 
-    return this.prisama.bookDoctorTime.update({
+    const updateBook = this.prisama.bookDoctorTime.update({
       where: { id },
       data: { ...rest, doctor: { connect: doctors!.map((d) => ({ id: d.id })) } },
       include: { doctor: true }
     })
 
+    return successRes(updateBook, 200)
+
   }
 
   async remove(id: number) {
     await this.findOne(id);
-
-    return this.prisama.bookDoctorTime.update({
+    const softDelete = this.prisama.bookDoctorTime.update({
       where: { id },
       data: {
         isDeleted: true,
         timeDeleted: new Date(),
       },
     });
+    return successRes(softDelete,200)
+
   }
+
+  
 
   async delete(id: number) {
     await this.findOne(id);
@@ -99,7 +105,7 @@ export class BookDoctorTimeService {
       where: { id },
 
     });
-    return {}
+    return successRes({},200)
   }
 
 }
