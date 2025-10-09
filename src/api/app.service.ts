@@ -6,6 +6,7 @@ import { AppModule } from './app.module';
 import { config } from 'src/config/envConfig';
 import { AllExceptionFilter } from 'src/infrastructure/exception/AllException';
 
+
 export class Aplication {
   static async main(): Promise<void> {
     // ========================= DATABASE =========================

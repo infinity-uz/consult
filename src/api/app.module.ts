@@ -4,12 +4,11 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule } from '@nestjs/config';
 import { AdminModule } from './user/admin/admin.module';
 import { PrismaModule } from 'src/core/prisma.module';
-import { BookDoctorTimeModule } from './book-doctor-time/book-doctor-time.module';
+import { DoctorModule } from './user/doctor/doctor.module';
 import { RedisModule } from 'src/core/redis/redis.module';
 import { AuthModule } from './user/auth/auth.module';
 import { PateintModule } from './user/pateint/pateint.module';
 import { WalletModule } from './post/wallet/wallet.module';
-import { DoctorModule } from './user/doctor/doctor.module';
 
 @Module({
   imports: [
@@ -20,9 +19,7 @@ import { DoctorModule } from './user/doctor/doctor.module';
       global: true,
     }),
     PrismaModule,
-    RedisModule,
     AdminModule,
-    BookDoctorTimeModule,
     DoctorModule,
     AuthModule,
     ChatModule,
