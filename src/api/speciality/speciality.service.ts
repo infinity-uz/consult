@@ -22,7 +22,7 @@ export class SpecialityService extends BaseService<
   }
 
   async create(dto: CreateSpecialityDto): Promise<ISuccess> {
-    const existsName = await this.prisma.service.findFirst({
+    const existsName = await this.prisma.speciality.findFirst({
       where: { name: dto.name },
     });
     if (existsName) throw new ConflictException('Service already exists');
@@ -32,13 +32,13 @@ export class SpecialityService extends BaseService<
     };
 
 
-    const service = await this.prisma.service.create({ data });
+    const speciality = await this.prisma.speciality.create({ data });
 
-    return successRes(service, 201);
+    return successRes(speciality, 201);
   }
 
   async update(id: number, dto: UpdateSpecialityDto): Promise<ISuccess> {
-    const exists = await this.prisma.service.findUnique({ where: { id } });
+    const exists = await this.prisma.speciality.findUnique({ where: { id } });
     if (!exists) {
       throw new NotFoundException(`Speciality with Id ${id} not found`);
     }
