@@ -1,9 +1,9 @@
 import {
-    BadRequestException,
-    ConflictException,
-    ForbiddenException,
-    Injectable,
-    NotFoundException,
+  BadRequestException,
+  ConflictException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
 } from '@nestjs/common';
 import { BookDoctor } from 'generated/prisma';
 import { BookDoctorStatus } from 'src/common/enum/bookDoctor.status.enum';
@@ -142,7 +142,6 @@ export class BookDoctorService extends BaseService<
     updateBookDoctorDto: UpdateBookDoctorDto,
     user: IToken,
   ): Promise<ISuccess> {
-    const { role } = user;
     const { serviceID, specialityId, doctorId } = updateBookDoctorDto;
 
     let checkBookDoctor = await this.prisma.bookDoctor.findFirst({

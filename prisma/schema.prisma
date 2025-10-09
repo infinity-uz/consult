@@ -1,312 +1,312 @@
 generator client {
-  provider = "prisma-client-js"
-  output   = "../generated/prisma"
+    provider = "prisma-client-js"
+    output   = "../generated/prisma"
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DEV_DB_URL")
+    provider = "postgresql"
+    url      = env("DEV_DB_URL")
 }
 
 // --------------------------- ENUM ---------------------------
 
 enum Role {
-  SUPERADMIN
-  ADMIN
-  DOCTOR
-  PATEINTS
+    SUPERADMIN
+    ADMIN
+    DOCTOR
+    PATEINTS
 }
 
 enum Gender {
-  MALE
-  FEMALE
+    MALE
+    FEMALE
 }
 
 enum BookDoctorStatus {
-  PENDING
-  PROCESS
-  SUCCESS
-  CANCELLED
+    PENDING
+    PROCESS
+    SUCCESS
+    CANCELLED
 }
 
 enum PaymentStatus {
-  PENDING
-  PAID
-  CANCELLED
+    PENDING
+    PAID
+    CANCELLED
 }
 
 enum PaymentType {
-  CASH
-  CARD
+    CASH
+    CARD
 }
 
 enum CardType {
-  UZCARD
-  HUMO
-  VISA
-  MASTERCARD
+    UZCARD
+    HUMO
+    VISA
+    MASTERCARD
 }
 
 enum ChatRating {
-  R1
-  R2
-  R3
-  R4
-  R5
+    R1
+    R2
+    R3
+    R4
+    R5
 }
 
 enum ComplaintType {
-  COMMENT
-  REVIEW
-  CHAT
-  COMPLAINT
-  REASON
+    COMMENT
+    REVIEW
+    CHAT
+    COMPLAINT
+    REASON
 }
 
 // --------------------------- ADMIN ---------------------------
 
 model Admin {
-  id          Int       @id @default(autoincrement())
-  createdAt   DateTime? @default(now())
-  updatedAt   DateTime? @updatedAt
-  isDeleted   Boolean?  @default(false)
-  timeDeleted DateTime?
+    id          Int       @id @default(autoincrement())
+    createdAt   DateTime? @default(now())
+    updatedAt   DateTime? @updatedAt
+    isDeleted   Boolean?  @default(false)
+    timeDeleted DateTime?
 
-  hashedPassword String
-  username       String  @unique()
-  phoneNumber    String  @unique()
-  role           Role    @default(ADMIN)
-  isActive       Boolean @default(false)
+    hashedPassword String
+    username       String  @unique()
+    phoneNumber    String  @unique()
+    role           Role    @default(ADMIN)
+    isActive       Boolean @default(false)
 }
 
 // --------------------------- DOCTOR ---------------------------
 
 model Doctor {
-  id          Int       @id @default(autoincrement())
-  createdAt   DateTime? @default(now())
-  updatedAt   DateTime? @updatedAt
-  isDeleted   Boolean?  @default(false)
-  timeDeleted DateTime?
+    id          Int       @id @default(autoincrement())
+    createdAt   DateTime? @default(now())
+    updatedAt   DateTime? @updatedAt
+    isDeleted   Boolean?  @default(false)
+    timeDeleted DateTime?
 
-  firstName   String
-  lastName    String
-  phoneNumber String  @unique()
-  age         Int
-  gender      Gender
-  location    String
-  isActive    Boolean @default(false)
-  role        Role    @default(DOCTOR)
+    firstName   String
+    lastName    String
+    phoneNumber String  @unique()
+    age         Int
+    gender      Gender
+    location    String
+    isActive    Boolean @default(false)
+    role        Role    @default(DOCTOR)
 
-  services       Service          @relation(fields: [servicesId], references: [id])
-  servicesId     Int
-  document       DoctorDocument[]
-  speciality     Speciality[]
-  doctorBookTime BookDoctorTime[]
-  bookDoctor     BookDoctor[]
-  wallet         Wallet[]
-  chat           Chat[]
+    services       Service          @relation(fields: [servicesId], references: [id])
+    servicesId     Int
+    document       DoctorDocument[]
+    speciality     Speciality[]
+    doctorBookTime BookDoctorTime[]
+    bookDoctor     BookDoctor[]
+    wallet         Wallet[]
+    chat           Chat[]
 }
 
 // --------------------------- PATIENTS ---------------------------
 
 model Pateints {
-  id          Int       @id @default(autoincrement())
-  createdAt   DateTime? @default(now())
-  updatedAt   DateTime? @updatedAt
-  isDeleted   Boolean?  @default(false)
-  timeDeleted DateTime?
+    id          Int       @id @default(autoincrement())
+    createdAt   DateTime? @default(now())
+    updatedAt   DateTime? @updatedAt
+    isDeleted   Boolean?  @default(false)
+    timeDeleted DateTime?
 
-  firstName   String
-  lastName    String
-  phoneNumber String  @unique()
-  gender      Gender
-  age         Int
-  location    String
-  isActive    Boolean @default(true)
-  role        Role    @default(PATEINTS)
+    firstName   String
+    lastName    String
+    phoneNumber String  @unique()
+    gender      Gender
+    age         Int
+    location    String
+    isActive    Boolean @default(true)
+    role        Role    @default(PATEINTS)
 
-  bookDoctor BookDoctor[]
-  wallet     Wallet[]
-  chat       Chat[]
+    bookDoctor BookDoctor[]
+    wallet     Wallet[]
+    chat       Chat[]
 }
 
 // --------------------------- DOCTOR DOCUMENT ---------------------------
 
 model DoctorDocument {
-  id          Int      @id @default(autoincrement())
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  isDeleted   Boolean  @default(false)
-  timeDeleted DateTime
+    id          Int      @id @default(autoincrement())
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+    isDeleted   Boolean  @default(false)
+    timeDeleted DateTime
 
-  passportUrl       String
-  diplomUrl         String
-  certificateUrl    String
-  selfEmploymentUrl String
-  imageUrl          String
+    passportUrl       String
+    diplomUrl         String
+    certificateUrl    String
+    selfEmploymentUrl String
+    imageUrl          String
 
-  doctor   Doctor @relation(fields: [doctorId], references: [id])
-  doctorId Int
+    doctor   Doctor @relation(fields: [doctorId], references: [id])
+    doctorId Int
 
-  image Image[]
+    image Image[]
 }
 
 // --------------------------- IMAGE ---------------------------
 
 model Image {
-  id          Int       @id @default(autoincrement())
-  createdAt   DateTime? @default(now())
-  updatedAt   DateTime? @updatedAt
-  isDeleted   Boolean?  @default(false)
-  timeDeleted DateTime?
+    id          Int       @id @default(autoincrement())
+    createdAt   DateTime? @default(now())
+    updatedAt   DateTime? @updatedAt
+    isDeleted   Boolean?  @default(false)
+    timeDeleted DateTime?
 
-  imageUrl String
-  name     String
+    imageUrl String
+    name     String
 
-  doctorDocument   DoctorDocument @relation(fields: [doctorDocumentId], references: [id])
-  doctorDocumentId Int
+    doctorDocument   DoctorDocument @relation(fields: [doctorDocumentId], references: [id])
+    doctorDocumentId Int
 }
 
 // --------------------------- SPECIALITY ---------------------------
 
 model Speciality {
-  id          Int       @id @default(autoincrement())
-  createdAt   DateTime? @default(now())
-  updatedAt   DateTime? @updatedAt
-  isDeleted   Boolean?  @default(false)
-  timeDeleted DateTime?
+    id          Int       @id @default(autoincrement())
+    createdAt   DateTime? @default(now())
+    updatedAt   DateTime? @updatedAt
+    isDeleted   Boolean?  @default(false)
+    timeDeleted DateTime?
 
-  name        String  @unique()
-  isActive    Boolean @default(true)
-  description String
+    name        String  @unique()
+    isActive    Boolean @default(true)
+    description String
 
-  doctor     Doctor[]
-  bookDoctor BookDoctor[]
+    doctor     Doctor[]
+    bookDoctor BookDoctor[]
 }
 
 // --------------------------- SERVICE ---------------------------
 
 model Service {
-  id          Int       @id @default(autoincrement())
-  createdAt   DateTime? @default(now())
-  updatedAt   DateTime? @updatedAt
-  isDeleted   Boolean?  @default(false)
-  timeDeleted DateTime?
+    id          Int       @id @default(autoincrement())
+    createdAt   DateTime? @default(now())
+    updatedAt   DateTime? @updatedAt
+    isDeleted   Boolean?  @default(false)
+    timeDeleted DateTime?
 
-  name        String
-  price       Decimal
-  description String
+    name        String
+    price       Decimal
+    description String
 
-  doctor     Doctor[]
-  bookDoctor BookDoctor[]
+    doctor     Doctor[]
+    bookDoctor BookDoctor[]
 }
 
 // --------------------------- CHAT ---------------------------
 
 model Chat {
-  id          Int       @id @default(autoincrement())
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  isDeleted   Boolean   @default(false)
-  timeDeleted DateTime?
+    id          Int       @id @default(autoincrement())
+    createdAt   DateTime  @default(now())
+    updatedAt   DateTime  @updatedAt
+    isDeleted   Boolean   @default(false)
+    timeDeleted DateTime?
 
-  rating       ChatRating
-  comments     String
-  complaint    ComplaintType @default(CHAT)
-  fromUserRole Role          @default(PATEINTS)
-  fromUserId   Int
-  toUserRole   Role          @default(DOCTOR)
-  toUserId     Int
+    rating       ChatRating
+    comments     String
+    complaint    ComplaintType @default(CHAT)
+    fromUserRole Role          @default(PATEINTS)
+    fromUserId   Int
+    toUserRole   Role          @default(DOCTOR)
+    toUserId     Int
 
-  doctor     Doctor   @relation(fields: [doctorId], references: [id])
-  doctorId   Int
-  pateints   Pateints @relation(fields: [pateintsId], references: [id])
-  pateintsId Int
+    doctor     Doctor   @relation(fields: [doctorId], references: [id])
+    doctorId   Int
+    pateints   Pateints @relation(fields: [pateintsId], references: [id])
+    pateintsId Int
 }
 
 // --------------------------- WALLET ---------------------------
 
 model Wallet {
-  id          Int       @id @default(autoincrement())
-  createdAt   DateTime? @default(now())
-  updatedAt   DateTime? @updatedAt
-  isDeleted   Boolean?  @default(false)
-  timeDeleted DateTime?
+    id          Int       @id @default(autoincrement())
+    createdAt   DateTime? @default(now())
+    updatedAt   DateTime? @updatedAt
+    isDeleted   Boolean?  @default(false)
+    timeDeleted DateTime?
 
-  name        String
-  cardNumber  String   @unique()
-  phoneNumber String   @unique()
-  type        CardType @default(HUMO)
-  date        String
-  cvv         Int?
-  balance     Float    @default(00.00)
+    name        String
+    cardNumber  String   @unique()
+    phoneNumber String   @unique()
+    type        CardType @default(HUMO)
+    date        String
+    cvv         Int?
+    balance     Decimal  @default(00.00)
 
-  doctor     Doctor?   @relation(fields: [doctorId], references: [id])
-  doctorId   Int?
-  pateints   Pateints? @relation(fields: [pateintsId], references: [id])
-  pateintsId Int?
+    doctor     Doctor?   @relation(fields: [doctorId], references: [id])
+    doctorId   Int?
+    pateints   Pateints? @relation(fields: [pateintsId], references: [id])
+    pateintsId Int?
 }
 
 // --------------------------- BOOK DOCTOR ---------------------------
 
 model BookDoctor {
-  id          Int      @id @default(autoincrement())
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  isDeleted   Boolean  @default(false)
-  timeDeleted DateTime?
+    id          Int       @id @default(autoincrement())
+    createdAt   DateTime  @default(now())
+    updatedAt   DateTime  @updatedAt
+    isDeleted   Boolean   @default(false)
+    timeDeleted DateTime?
 
-  bookDate String
-  isActive Boolean          @default(true)
-  status   BookDoctorStatus @default(PENDING)
-  location String
-  notes    String?
+    bookDate String
+    isActive Boolean          @default(true)
+    status   BookDoctorStatus @default(PENDING)
+    location String
+    notes    String?
 
-  service      Service    @relation(fields: [serviceID], references: [id])
-  serviceID    Int
-  doctor       Doctor     @relation(fields: [doctorId], references: [id])
-  doctorId     Int
-  speciality   Speciality @relation(fields: [specialityId], references: [id])
-  specialityId Int
-  pateints     Pateints   @relation(fields: [pateintsId], references: [id])
-  pateintsId   Int
-  payment      Payment[]
+    service      Service    @relation(fields: [serviceID], references: [id])
+    serviceID    Int
+    doctor       Doctor     @relation(fields: [doctorId], references: [id])
+    doctorId     Int
+    speciality   Speciality @relation(fields: [specialityId], references: [id])
+    specialityId Int
+    pateints     Pateints   @relation(fields: [pateintsId], references: [id])
+    pateintsId   Int
+    payment      Payment[]
 }
 
 // --------------------------- PAYMENT ---------------------------
 
 model Payment {
-  id          Int      @id @default(autoincrement())
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  isDeleted   Boolean  @default(false)
-  timeDeleted DateTime?
+    id          Int       @id @default(autoincrement())
+    createdAt   DateTime  @default(now())
+    updatedAt   DateTime  @updatedAt
+    isDeleted   Boolean   @default(false)
+    timeDeleted DateTime?
 
-  status       PaymentStatus
-  pateintsName String
-  doctorName   String
-  paymentType  PaymentType   @default(CARD)
-  meetingDate  String
-  description  String
-  amount       Float
+    status       PaymentStatus
+    pateintsName String
+    doctorName   String
+    paymentType  PaymentType   @default(CARD)
+    meetingDate  String
+    description  String
+    amount       Decimal
 
-  doctorBook   BookDoctor @relation(fields: [doctorBookId], references: [id])
-  doctorBookId Int
+    doctorBook   BookDoctor @relation(fields: [doctorBookId], references: [id])
+    doctorBookId Int
 }
 
 // --------------------------- BOOK DOCTOR TIME ---------------------------
 
 model BookDoctorTime {
-  id          Int       @id @default(autoincrement())
-  createdAt   DateTime? @default(now())
-  updatedAt   DateTime? @updatedAt
-  isDeleted   Boolean?  @default(false)
-  timeDeleted DateTime?
+    id          Int       @id @default(autoincrement())
+    createdAt   DateTime? @default(now())
+    updatedAt   DateTime? @updatedAt
+    isDeleted   Boolean?  @default(false)
+    timeDeleted DateTime?
 
-  date       String
-  startTime  String
-  finishTime String
-  isActive   Boolean @default(true)
+    date       String
+    startTime  String
+    finishTime String
+    isActive   Boolean @default(true)
 
-  doctor Doctor[]
+    doctor Doctor[]
 }

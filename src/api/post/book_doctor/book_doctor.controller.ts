@@ -1,12 +1,12 @@
 import {
-    Body,
-    Controller,
-    Delete,
-    Get,
-    Param,
-    Patch,
-    Post,
-    UseGuards,
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { GetRequestUser } from 'src/common/decorator/get-request-user.decorator';
@@ -19,13 +19,13 @@ import type { IToken } from 'src/infrastructure/token/interface';
 import { BookDoctorService } from './book_doctor.service';
 
 import {
-    SwaggerRelatedToChangeStatus,
-    SwaggerRelatedToCreate,
-    SwaggerRelatedToDelete,
-    SwaggerRelatedToFindAll,
-    SwaggerRelatedToFindOne,
-    SwaggerRelatedToUpdate,
-} from './decorator/swagger.decorator';
+  SwaggerRelatedToChangeStatus,
+  SwaggerRelatedToCreate,
+  SwaggerRelatedToDelete,
+  SwaggerRelatedToFindAll,
+  SwaggerRelatedToFindOne,
+  SwaggerRelatedToUpdate,
+} from 'src/common/swagger/book_doctor.swagger';
 import { CreateBookDoctorDto } from './dto/create-book_doctor.dto';
 import { UpdateBookDoctorDto } from './dto/update-book_doctor.dto';
 
@@ -36,7 +36,7 @@ export class BookDoctorController {
 
   // =================== CREATE ===================
   @SwaggerRelatedToCreate()
-  @AccessRoles(Roles.PATEINTS)
+  @AccessRoles(Roles.PATEINTS, Roles.ADMIN, Roles.SUPERADMIN)
   @Post()
   @ApiBearerAuth()
   create(
