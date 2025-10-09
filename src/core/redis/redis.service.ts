@@ -1,5 +1,10 @@
 // redis.service.ts
-import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
+import {
+  Injectable,
+  OnModuleInit,
+  OnModuleDestroy,
+  Logger,
+} from '@nestjs/common';
 import { createClient, RedisClientType } from 'redis';
 import { config } from 'src/config/envConfig';
 
@@ -19,7 +24,8 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
     this.client.on('error', (err) => console.error('Redis Client Error', err));
 
     await this.client.connect();
-    console.log('✅ Redis connected');
+    const logging = new Logger();
+    logging.log('✅ Redis connected');
   }
 
   async onModuleDestroy() {
@@ -41,7 +47,7 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
   async get<T>(key: string): Promise<T | null> {
     const data = await this.client.get(key);
     if (!data) return null;
-    
+
     if (data.startsWith('{') || data.startsWith('[')) {
       return JSON.parse(data) as T;
     }
