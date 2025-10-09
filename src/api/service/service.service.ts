@@ -31,7 +31,7 @@ export class ServiceService extends BaseService<
       ...dto,
     };
 
-    
+    0
 
     const service = await this.prisma.service.create({ data });
 

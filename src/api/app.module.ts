@@ -4,9 +4,11 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule } from '@nestjs/config';
 import { AdminModule } from './user/admin/admin.module';
 import { PrismaModule } from 'src/core/prisma.module';
-import { ServiceModule } from './service/service.module';
-import { SpecialityModule } from './speciality/speciality.module';
-
+import { DoctorModule } from './user/doctor/doctor.module';
+import { RedisModule } from 'src/core/redis/redis.module';
+import { AuthModule } from './user/auth/auth.module';
+import { PateintModule } from './user/pateint/pateint.module';
+import { WalletModule } from './post/wallet/wallet.module';
 
 @Module({
   imports: [
@@ -18,8 +20,12 @@ import { SpecialityModule } from './speciality/speciality.module';
     }),
     PrismaModule,
     AdminModule,
-    ServiceModule,
-    SpecialityModule
+    DoctorModule,
+    AuthModule,
+    ChatModule,
+    PateintModule,
+    WalletModule
+
   ],
   controllers: [],
 })
