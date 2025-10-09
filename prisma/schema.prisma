@@ -301,6 +301,9 @@ model BookDoctorTime {
   id          Int       @id @default(autoincrement())
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+  isDeleted   Boolean?  @default(false)
+  timeDeleted DateTime?
+
 
   date       String
   startTime  String
