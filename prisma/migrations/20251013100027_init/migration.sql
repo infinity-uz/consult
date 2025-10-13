@@ -216,8 +216,8 @@ CREATE TABLE "public"."Payment" (
 -- CreateTable
 CREATE TABLE "public"."BookDoctorTime" (
     "id" SERIAL NOT NULL,
-    "createdAt" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3),
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
     "isDeleted" BOOLEAN DEFAULT false,
     "timeDeleted" TIMESTAMP(3),
     "date" TEXT NOT NULL,

@@ -27,7 +27,7 @@ export class CreateWalletDto {
 	})
 	@IsNotEmpty()
 	cardNumber: string;
-
+// --------------------------------PHONE NUMBER --------------------------------
 	@ApiProperty({
 		type: 'string',
 		description: "Telefon raqami +998 bilan boshlanishi kerak",
@@ -37,7 +37,7 @@ export class CreateWalletDto {
 		message: "Telefon raqami noto'gri formatda"
 	})
 	@IsNotEmpty()
-	phoneNumber: string;
+	public phoneNumber: string;
 
 	@ApiProperty({
 		type: 'string',
