@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { ChatModule } from './post/chat/chat.module';
+import { ChatModule } from './chat/chat.module';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule } from '@nestjs/config';
 import { AdminModule } from './user/admin/admin.module';
@@ -8,13 +8,6 @@ import { DoctorModule } from './user/doctor/doctor.module';
 import { RedisModule } from 'src/core/redis/redis.module';
 import { AuthModule } from './user/auth/auth.module';
 import { PateintModule } from './user/pateint/pateint.module';
-import { WalletModule } from './post/wallet/wallet.module';
-import { BookDoctorTimeModule } from './post/book-doctor-time/book-doctor-time.module';
-import { ServiceModule } from './post/service/service.module';
-import { ImageModule } from './post/image/image.module';
-import { DoctorDocumentModule } from './post/doctor-document/doctor-document.module';
-import { BookDoctorModule } from './post/book_doctor/book_doctor.module';
-import { PaymentModule } from './post/payment/payment.module';
 
 @Module({
   imports: [
@@ -24,25 +17,14 @@ import { PaymentModule } from './post/payment/payment.module';
     JwtModule.register({
       global: true,
     }),
-    // user
-    AdminModule,
-    DoctorModule,
-    PateintModule,
-    AuthModule,
-
-    // post
-    ChatModule,
-    WalletModule,
-    BookDoctorTimeModule,
-    ServiceModule,
-    ImageModule,
-    DoctorDocumentModule,
-    BookDoctorModule,
-    PaymentModule,
-
-    // core
     PrismaModule,
     RedisModule,
+    AdminModule,
+    DoctorModule,
+    AuthModule,
+    ChatModule,
+    PateintModule,
+
   ],
   controllers: [],
 })

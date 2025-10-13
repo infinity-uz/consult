@@ -1,12 +1,12 @@
 import { HttpException } from '@nestjs/common';
 import { PrismaClient } from 'generated/prisma';
-import { RepositoryPager } from '../pagination/RepositoryPager';
-import { successRes } from '../response/success';
 import {
+  ISuccess,
   IFindOptions,
   IResponsePagination,
-  ISuccess,
 } from '../response/success.interface';
+import { successRes } from '../response/success';
+import { RepositoryPager } from '../pagination/RepositoryPager';
 
 export class BaseService<CreateDto, UpdateDto, Entity extends { id: number }> {
   constructor(

@@ -24,8 +24,6 @@ import { softDeleteDto } from 'src/common/dto/soft-delete.dto';
 import { RegisterDoctorDto } from './dto/register-doctor.dto';
 import { AuthGuard } from 'src/common/guard/auth.guard';
 import { RolesGuard } from 'src/common/guard/roles.guard';
-import { SwaggerApi } from 'src/common/swagger/response.swagger';
-import { doctorData } from 'src/common/document/doctorData';
 
 @UseGuards(AuthGuard, RolesGuard)
 @Controller('doctor')
@@ -38,14 +36,29 @@ export class DoctorController {
   @ApiOperation({
     summary: 'Register',
   })
-  @ApiResponse(SwaggerApi.ApiSuccessResponse(doctorData, HttpStatus.OK))
-  @ApiResponse(
-    SwaggerApi.ApiErrorResponse(
-      'Phone number already exists',
-      HttpStatus.CONFLICT,
-      409,
-    ),
-  )
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'function for doctor',
+    schema: {
+      example: {
+        statusCode: 200,
+        message: 'success',
+        data: {},
+      },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.CONFLICT,
+    description: 'Error during registration',
+    schema: {
+      example: {
+        statusCode: 409,
+        error: {
+          message: 'Phone number already exists',
+        },
+      },
+    },
+  })
   @AccessRoles('public')
   @Post('register')
   register(@Body() dto: RegisterDoctorDto) {
@@ -56,16 +69,31 @@ export class DoctorController {
   @ApiOperation({
     summary: 'Get new access token',
   })
-  @ApiResponse(
-    SwaggerApi.ApiSuccessResponse({
-      data: {
-        token: 'aslksfjo2i3n4n2309idsfn2i3jo423lj423kj',
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'New access token get successfully',
+    schema: {
+      example: {
+        statusCode: 200,
+        message: 'success',
+        data: {
+          token: 'aslksfjo2i3n4n2309idsfn2i3jo423lj423kj',
+        },
       },
-    }),
-  )
-  @ApiResponse(
-    SwaggerApi.ApiErrorResponse('forbidden user', HttpStatus.FORBIDDEN, 403),
-  )
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Unauthorized',
+    schema: {
+      example: {
+        statusCode: 400,
+        error: {
+          message: 'Refresh token expired',
+        },
+      },
+    },
+  })
   @AccessRoles(Roles.SUPERADMIN, 'ID')
   @Post('token')
   @ApiBearerAuth()
@@ -75,14 +103,29 @@ export class DoctorController {
 
   // ------------------- SIGNOUT -------------------
   @ApiOperation({ summary: 'Sign out doctor' })
-  @ApiResponse(SwaggerApi.ApiSuccessResponse())
-  @ApiResponse(
-    SwaggerApi.ApiErrorResponse(
-      'Refresh token not found',
-      HttpStatus.UNAUTHORIZED,
-      401,
-    ),
-  )
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Administrator sign out successfully',
+    schema: {
+      example: {
+        statusCode: 200,
+        message: 'success',
+        data: {},
+      },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Failed sign out doctor',
+    schema: {
+      example: {
+        statusCode: 401,
+        error: {
+          message: 'Refresh token not found',
+        },
+      },
+    },
+  })
   @AccessRoles(Roles.DOCTOR)
   @Post('signout')
   @ApiBearerAuth()
@@ -95,7 +138,29 @@ export class DoctorController {
 
   // ----------- FIND ALL WITH PAGINATION -----------
   @ApiOperation({ summary: 'Find all doctors with pagination' })
-  @ApiResponse(SwaggerApi.ApiSuccessResponse([doctorData], HttpStatus.OK))
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'All doctors get successfully with pagination',
+    schema: {
+      example: {
+        statusCode: 200,
+        message: 'success',
+        data: {},
+      },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: 'Error on get doctors',
+    schema: {
+      example: {
+        statusCode: 500,
+        error: {
+          message: 'Internal server error',
+        },
+      },
+    },
+  })
   @AccessRoles(Roles.SUPERADMIN, Roles.ADMIN)
   @Get()
   @ApiBearerAuth()
@@ -120,7 +185,29 @@ export class DoctorController {
 
   // ------------------- FIND ALL -------------------
   @ApiOperation({ summary: 'Get all doctors' })
-  @ApiResponse(SwaggerApi.ApiSuccessResponse([doctorData], HttpStatus.OK))
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'All doctors get successfully ',
+    schema: {
+      example: {
+        statusCode: 200,
+        message: 'success',
+        data: [],
+      },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'Failed get doctors',
+    schema: {
+      example: {
+        statusCode: 403,
+        error: {
+          message: 'Forbidden user',
+        },
+      },
+    },
+  })
   @AccessRoles(Roles.SUPERADMIN, Roles.ADMIN)
   @Get('all')
   @ApiBearerAuth()
@@ -132,10 +219,29 @@ export class DoctorController {
 
   // ----------------- FIND BY ID -----------------
   @ApiOperation({ summary: 'Get doctor by id' })
-  @ApiResponse(SwaggerApi.ApiSuccessResponse(doctorData, HttpStatus.OK))
-  @ApiResponse(
-    SwaggerApi.ApiErrorResponse('Doctor not found0', HttpStatus.NOT_FOUND, 404),
-  )
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Get doctor by id successfully ',
+    schema: {
+      example: {
+        statusCode: 200,
+        message: 'success',
+        data: {},
+      },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.FORBIDDEN,
+    description: 'Failed get doctor by id',
+    schema: {
+      example: {
+        statusCode: 403,
+        error: {
+          message: 'Forbidden user',
+        },
+      },
+    },
+  })
   @AccessRoles(Roles.SUPERADMIN, Roles.ADMIN, 'ID')
   @Get(':id')
   @ApiBearerAuth()
@@ -144,10 +250,30 @@ export class DoctorController {
   }
 
   // ------------------- UPDATE -------------------
-  @ApiResponse(SwaggerApi.ApiSuccessResponse(doctorData, HttpStatus.OK))
-  @ApiResponse(
-    SwaggerApi.ApiErrorResponse('Doctor not found0', HttpStatus.NOT_FOUND, 404),
-  )
+  @ApiOperation({ summary: 'Updating doctor' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Updating doctor',
+    schema: {
+      example: {
+        statusCode: 200,
+        message: 'success',
+        data: {},
+      },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Failed updating doctor',
+    schema: {
+      example: {
+        statusCode: 404,
+        error: {
+          message: 'Not found',
+        },
+      },
+    },
+  })
   @AccessRoles(Roles.SUPERADMIN, Roles.ADMIN, 'ID')
   @Patch(':id')
   @ApiBearerAuth()
@@ -156,10 +282,30 @@ export class DoctorController {
   }
 
   // --------------- SOFT DELETE ------------------
-  @ApiResponse(SwaggerApi.ApiSuccessResponse(doctorData, HttpStatus.OK))
-  @ApiResponse(
-    SwaggerApi.ApiErrorResponse('Doctor not found0', HttpStatus.NOT_FOUND, 404),
-  )
+  @ApiOperation({ summary: 'Soft delete and activate doctor' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Soft delete and active doctor',
+    schema: {
+      example: {
+        statusCode: 200,
+        message: 'success',
+        data: {},
+      },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Failed soft delete and active doctor',
+    schema: {
+      example: {
+        statusCode: 404,
+        error: {
+          message: 'Not found',
+        },
+      },
+    },
+  })
   @AccessRoles(Roles.SUPERADMIN, Roles.ADMIN)
   @Patch('softDelete:id')
   @ApiBearerAuth()
@@ -169,12 +315,29 @@ export class DoctorController {
 
   // ------------------- DELETE -------------------
   @ApiOperation({ summary: 'Delete doctor' })
-  @ApiResponse(
-    SwaggerApi.ApiErrorResponse('Doctor not found0', HttpStatus.NOT_FOUND, 404),
-  )
-  @ApiResponse(
-    SwaggerApi.ApiErrorResponse('Doctor not found0', HttpStatus.NOT_FOUND, 404),
-  )
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Delete doctor',
+    schema: {
+      example: {
+        statusCode: 200,
+        message: 'success',
+        data: {},
+      },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Failed delete doctor',
+    schema: {
+      example: {
+        statusCode: 404,
+        error: {
+          message: 'Not found',
+        },
+      },
+    },
+  })
   @AccessRoles(Roles.SUPERADMIN)
   @Delete(':id')
   @ApiBearerAuth()
