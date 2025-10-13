@@ -1,25 +1,9 @@
-import {
-  Body,
-  Controller,
-  HttpStatus,
-  Param,
-  Patch,
-  Post,
-  Res,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, HttpStatus, Post, Res } from '@nestjs/common';
 import { AuthService } from './auth.service';
+import { ConfirmPhoneNumberDto } from 'src/common/dto/registerPhoneNumber-doctor.dto';
 import { type Response } from 'express';
-
-import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { SwaggerApi } from 'src/common/swagger/response.swagger';
-import { ConfirmOtpDto } from './dto/confirmOtp.dto';
-import { ConfirmPhoneNumberDto } from './dto/registerPhoneNumber-doctor.dto';
-import { updatePhoneNumber } from './dto/updatePhoneNumber.dto';
-import { AuthGuard } from 'src/common/guard/auth.guard';
-import { RolesGuard } from 'src/common/guard/roles.guard';
-import { AccessRoles } from 'src/common/decorator/roles.decorator';
-import { Roles } from 'src/common/enum/Roles.enum';
+import { ConfirmOtpDto } from 'src/common/dto/confirmOtp.dto';
+import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 
 @Controller('auth')
 export class AuthController {
@@ -27,36 +11,61 @@ export class AuthController {
 
   // ------------------- SEND OTP -------------------
   @ApiOperation({ summary: 'Send otp' })
-  @ApiResponse(SwaggerApi.ApiSuccessResponse())
-  @ApiResponse(SwaggerApi.ApiErrorResponse('error in send otp'))
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Send otp for doctor and patient',
+    schema: {
+      example: {
+        statusCode: 200,
+        message: 'success',
+        data: {},
+      },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Failed to sending otp',
+    schema: {
+      example: {
+        statusCode: 404,
+        error: {
+          message: 'user not found',
+        },
+      },
+    },
+  })
   @Post('sendOtp')
   sendOTP(@Body() dto: ConfirmPhoneNumberDto) {
-    console.log('bbb');
-    
     return this.authService.sendOTP(dto);
   }
 
   // ----------------- CONFIRM OTP ------------------
   @ApiOperation({ summary: 'Confirm otp' })
-  @ApiResponse(SwaggerApi.ApiSuccessResponse())
-  @ApiResponse(SwaggerApi.ApiErrorResponse('error in confirm otp'))
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Confirm otp for doctor and patient',
+    schema: {
+      example: {
+        statusCode: 200,
+        message: 'success',
+        data: {},
+      },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Failed to confirm otp',
+    schema: {
+      example: {
+        statusCode: 400,
+        error: {
+          message: 'otp expired or incorect',
+        },
+      },
+    },
+  })
   @Post('confirOTP')
-  confirmOTP(
-    @Body() dto: ConfirmOtpDto,
-    @Res({ passthrough: true }) res: Response,
-  ) {
+  confirmOTP(@Body() dto: ConfirmOtpDto, @Res({passthrough:true}) res: Response) {
     return this.authService.confirmOtp(res, dto);
-  }
-  
-  // ----------------- UPDATE ------------------
-  @ApiOperation({ summary: 'Confirm otp' })
-  @ApiResponse(SwaggerApi.ApiSuccessResponse())
-  @ApiResponse(SwaggerApi.ApiErrorResponse('error in confirm otp'))
-  @UseGuards(AuthGuard, RolesGuard)
-  @AccessRoles(Roles.ADMIN, Roles.SUPERADMIN, 'ID')
-  @Patch('updatePhoneNumber:id')
-  @ApiBearerAuth()
-  updatePhoneNumber(@Param('id') id: number, @Body() dto: updatePhoneNumber) {
-    return this.authService.updatePhoneNumber(id, dto);
   }
 }
