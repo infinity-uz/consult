@@ -9,6 +9,8 @@ import { RedisModule } from 'src/core/redis/redis.module';
 import { AuthModule } from './user/auth/auth.module';
 import { PateintModule } from './user/pateint/pateint.module';
 import { WalletModule } from './post/wallet/wallet.module';
+import { BookDoctorTimeModule } from './post/book-doctor-time/book-doctor-time.module';
+import { ServiceModule } from './post/service/service.module';
 
 @Module({
   imports: [
@@ -18,14 +20,18 @@ import { WalletModule } from './post/wallet/wallet.module';
     JwtModule.register({
       global: true,
     }),
-    PrismaModule,
+    // user
     AdminModule,
     DoctorModule,
+    PateintModule,
+    // post
+    BookDoctorTimeModule,
     AuthModule,
     ChatModule,
-    PateintModule,
-    WalletModule
-
+    WalletModule,
+    ServiceModule,
+    //database
+    PrismaModule,
   ],
   controllers: [],
 })
