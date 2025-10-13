@@ -13,6 +13,8 @@ import { BookDoctorTimeModule } from './post/book-doctor-time/book-doctor-time.m
 import { ServiceModule } from './post/service/service.module';
 import { ImageModule } from './post/image/image.module';
 import { DoctorDocumentModule } from './post/doctor-document/doctor-document.module';
+import { BookDoctorModule } from './post/book_doctor/book_doctor.module';
+import { PaymentModule } from './post/payment/payment.module';
 
 @Module({
   imports: [
@@ -26,17 +28,22 @@ import { DoctorDocumentModule } from './post/doctor-document/doctor-document.mod
     AdminModule,
     DoctorModule,
     PateintModule,
-    // post
-    BookDoctorTimeModule,
     AuthModule,
+
+    // post
     ChatModule,
     WalletModule,
+    BookDoctorTimeModule,
     ServiceModule,
-    // ImageModule,
+    ImageModule,
     DoctorDocumentModule,
-    //database
+    BookDoctorModule,
+    PaymentModule,
+
+    // core
     PrismaModule,
+    RedisModule,
   ],
   controllers: [],
 })
-export class AppModule { }
+export class AppModule {}
