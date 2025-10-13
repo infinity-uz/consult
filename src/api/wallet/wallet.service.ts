@@ -59,13 +59,6 @@ export class WalletService extends BaseService
 			throw new BadRequestException('this Phone number is already exists');
 		}
 
-		// const cardReqiuresCvv = ([CardType.VISA, CardType.MASTERCARD] as CardType[])
-		// 	.includes(createWalletDto.type);
-		// if (cardReqiuresCvv && (createWalletDto.cvv === undefined || !/^\d{3,4}$/
-		// 	.test(String(createWalletDto.cvv)))) {
-		// 	throw new BadRequestException('Bu karta turi uchun 3 yoki 4 xonali (cvv) kiritish majburiy');
-		// }
-
 		const cardReqiuresCvv = ([CardType.VISA, CardType.MASTERCARD] as CardType[]).includes(type);
 
 		if (cardReqiuresCvv) {
@@ -166,7 +159,7 @@ export class WalletService extends BaseService
 			throw new ForbiddenException('Siz walletni update qila olmaysiz');
 		}
 
-		const { name, cardNumber, phoneNumber, date, cvv, type } = updateWalletDto;
+		const { cardNumber, phoneNumber } = updateWalletDto;
 
 		if (cardNumber) {
 			const existsCard = await this.prisma.wallet.findUnique({ where: { cardNumber } });
