@@ -15,6 +15,7 @@ export class Aplication {
       logger: ['error', 'warn', 'log'],
       cors: true,
     });
+   
 
     app.useGlobalFilters(new AllExceptionFilter());
 

@@ -133,22 +133,22 @@ model Pateints {
 // --------------------------- DOCTOR DOCUMENT ---------------------------
 
 model DoctorDocument {
-    id          Int      @id @default(autoincrement())
-    createdAt   DateTime @default(now())
-    updatedAt   DateTime @updatedAt
-    isDeleted   Boolean  @default(false)
-    timeDeleted DateTime
+  id          Int      @id @default(autoincrement())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  isDeleted   Boolean  @default(false)
+  timeDeleted DateTime?
 
-    passportUrl       String
-    diplomUrl         String
-    certificateUrl    String
-    selfEmploymentUrl String
-    imageUrl          String
+  passportUrl       String
+  diplomUrl         String
+  certificateUrl    String
+  selfEmploymentUrl String
+  imageUrl          String
 
-    doctor   Doctor @relation(fields: [doctorId], references: [id])
-    doctorId Int
+  doctor   Doctor @relation(fields: [doctorId], references: [id])
+  doctorId Int
 
-    image Image[]
+  image Image[]
 }
 
 // --------------------------- IMAGE ---------------------------
