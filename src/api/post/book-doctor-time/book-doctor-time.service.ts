@@ -11,6 +11,7 @@ export class BookDoctorTimeService {
   async create(createBookDoctorTimeDto: CreateBookDoctorTimeDto) {
     const { doctorId, ...rest } = createBookDoctorTimeDto;
 
+
     const doctor = await this.prisama.doctor.findMany({ where: { id: { in: doctorId } } })
     if (doctor.length !== doctorId.length) {
       throw new ConflictException("doctor id lardan biri topilmadi")
@@ -18,6 +19,29 @@ export class BookDoctorTimeService {
 
 
     const { date, startTime, finishTime } = createBookDoctorTimeDto;
+
+
+    const [startHour, startMinute] = startTime.split(':').map(Number);
+    const [finishHour, finishMinute] = finishTime.split(':').map(Number);
+
+    const start = startHour * 60 + startMinute;
+    const finish = finishHour * 60 + finishMinute;
+
+    if (finish <= start) {
+      throw new ConflictException("Tugash vaqti boshlanish vaqtidan keyin bolishi kerak");
+    }
+
+
+    const workStart = 9 * 60;   
+    const workEnd = 18 * 60;    
+
+    if (start < workStart || finish > workEnd) {
+      throw new ConflictException(
+        "Ish vaqti tugagan. Sizga hizmat korsatishini hohlasangiz, doktoringiz bilan alohida boglaning"
+      );
+    }
+
+
 
     const conflict = await this.prisama.bookDoctorTime.findFirst({
       where: {
@@ -92,11 +116,11 @@ export class BookDoctorTimeService {
         timeDeleted: new Date(),
       },
     });
-    return successRes(softDelete,200)
+    return successRes(softDelete, 200)
 
   }
 
-  
+
 
   async delete(id: number) {
     await this.findOne(id);
@@ -105,7 +129,7 @@ export class BookDoctorTimeService {
       where: { id },
 
     });
-    return successRes({},200)
+    return successRes({}, 200)
   }
 
 }

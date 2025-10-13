@@ -33,7 +33,7 @@ export class CreateBookDoctorTimeDto {
 
 
     @ApiProperty({
-        example: [1, 2, 3],
+        example: [1],
         description: "Doktor ID lar royxati ",
     })
     @IsArray()

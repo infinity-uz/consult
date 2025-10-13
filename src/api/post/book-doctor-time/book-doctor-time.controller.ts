@@ -68,7 +68,7 @@ export class BookDoctorTimeController {
 
 
 
-  @Delete('soft/:id')
+  @Patch('soft/:id')
   @ApiOperation({ summary: "is delete BookDoctorTime  (soft-delete)"})
   @ApiBearerAuth()
   @UseGuards(AuthGuard,RolesGuard)
@@ -84,7 +84,7 @@ export class BookDoctorTimeController {
   @ApiOperation({ summary: "is delete BookDoctorTime  (hard-delete)"})
   @ApiBearerAuth()
   @UseGuards(AuthGuard,RolesGuard)
-  @AccessRoles(Roles.ADMIN,Roles.DOCTOR, Roles.SUPERADMIN)
+  @AccessRoles(Roles.ADMIN, Roles.SUPERADMIN)
   delete(@Param('id') id: string) {
     return this.bookDoctorTimeService.delete(+id);
   }
