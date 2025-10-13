@@ -41,7 +41,7 @@ export class PaymentService extends BaseService<
 
     if (
       bookDoctor.status === BookDoctorStatus.CANCELLED ||
-      bookDoctor.status === BookDoctorStatus.PENDING
+      bookDoctor.status === BookDoctorStatus.SUCCESS
     ) {
       throw new ConflictException('Invalid booking status');
     }

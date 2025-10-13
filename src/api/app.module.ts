@@ -15,6 +15,7 @@ import { ImageModule } from './post/image/image.module';
 import { DoctorDocumentModule } from './post/doctor-document/doctor-document.module';
 import { BookDoctorModule } from './post/book_doctor/book_doctor.module';
 import { PaymentModule } from './post/payment/payment.module';
+import { SpecialityModule } from './post/speciality/speciality.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { PaymentModule } from './post/payment/payment.module';
     WalletModule,
     BookDoctorTimeModule,
     ServiceModule,
+    SpecialityModule,
     ImageModule,
     DoctorDocumentModule,
     BookDoctorModule,
