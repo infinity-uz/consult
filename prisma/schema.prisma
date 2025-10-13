@@ -204,24 +204,25 @@ model Service {
 // --------------------------- CHAT ---------------------------
 
 model Chat {
-    id          Int       @id @default(autoincrement())
-    createdAt   DateTime  @default(now())
-    updatedAt   DateTime  @updatedAt
-    isDeleted   Boolean   @default(false)
-    timeDeleted DateTime?
+  id          Int       @id @default(autoincrement())
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  isDeleted   Boolean   @default(false)
+  timeDeleted DateTime?
 
-    rating       ChatRating
-    comments     String
-    complaint    ComplaintType @default(CHAT)
-    fromUserRole Role          @default(PATEINTS)
-    fromUserId   Int
-    toUserRole   Role          @default(DOCTOR)
-    toUserId     Int
+  rating       ChatRating
+  comments     String
+  complaint    ComplaintType @default(CHAT)
+  fromUserRole Role          @default(PATEINTS)
+  fromUserId   Int
+  toUserRole   Role          @default(DOCTOR)
+  toUserId     Int
 
-    doctor     Doctor   @relation(fields: [doctorId], references: [id])
-    doctorId   Int
-    pateints   Pateints @relation(fields: [pateintsId], references: [id])
-    pateintsId Int
+
+  doctor     Doctor   @relation(fields: [doctorId], references: [id])
+  doctorId   Int
+  pateints   Pateints @relation(fields: [pateintsId], references: [id])
+  pateintsId Int
 }
 
 // --------------------------- WALLET ---------------------------
@@ -309,4 +310,5 @@ model BookDoctorTime {
     isActive   Boolean @default(true)
 
     doctor Doctor[]
+
 }

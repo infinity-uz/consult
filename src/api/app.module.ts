@@ -21,7 +21,6 @@ import { PaymentModule } from './post/payment/payment.module';
       global: true,
     }),
     PrismaModule,
-    RedisModule,
     AdminModule,
     DoctorModule,
     AuthModule,
