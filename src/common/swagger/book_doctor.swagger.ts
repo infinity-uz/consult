@@ -53,7 +53,7 @@ export function SwaggerRelatedToCreate() {
 export function SwaggerRelatedToFindAll() {
   return applyDecorators(
     ApiOperation({
-      summary: 'Get all doctor bookings (admin/superadmin only) or (pateint)',
+      summary: 'Get all doctor bookings (admin/superadmin only)',
     }),
     ApiResponse({
       status: HttpStatus.OK,

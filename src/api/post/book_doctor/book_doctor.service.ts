@@ -44,11 +44,6 @@ export class BookDoctorService extends BaseService<
     user: IToken,
   ): Promise<ISuccess> {
     const { serviceID, doctorId, specialityId } = createBookDoctorDto;
-    const checkPateints = await this.prisma.pateints.findUnique({
-      where: { id: user.id },
-    });
-    if (!checkPateints || checkPateints.isActive == false)
-      throw new NotFoundException(`Not found pateints`);
 
     const checkDoctor = await this.prisma.doctor.findUnique({
       where: { id: doctorId },
@@ -69,6 +64,12 @@ export class BookDoctorService extends BaseService<
     });
     if (!checkSpeciality || checkSpeciality.isActive == false)
       throw new NotFoundException(`Not found speciality`);
+
+    const checkPateints = await this.prisma.pateints.findUnique({
+      where: { id: user.id },
+    });
+    if (!checkPateints || checkPateints.isActive == false)
+      throw new NotFoundException(`Not found pateints`);
 
     if (
       checkDoctor.servicesId !== serviceID ||

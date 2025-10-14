@@ -8,7 +8,6 @@ import { DoctorModule } from './user/doctor/doctor.module';
 import { RedisModule } from 'src/core/redis/redis.module';
 import { AuthModule } from './user/auth/auth.module';
 import { PateintModule } from './user/pateint/pateint.module';
-import { SpecialityModule } from './post/speciality/speciality.module
 
 @Module({
   imports: [
@@ -18,15 +17,12 @@ import { SpecialityModule } from './post/speciality/speciality.module
     JwtModule.register({
       global: true,
     }),
-
-    WalletModule,
-    BookDoctorTimeModule,
-    ServiceModule,
-    SpecialityModule,
-    ImageModule,
-    DoctorDocumentModule,
-    BookDoctorModule,
-    PaymentModule,
+    PrismaModule,
+    RedisModule,
+    AdminModule,
+    DoctorModule,
+    AuthModule,
+    ChatModule,
     PateintModule,
 
   ],
