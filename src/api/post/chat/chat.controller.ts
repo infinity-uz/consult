@@ -35,7 +35,7 @@ export class ChatController {
   @Patch('chatupdate/:id')
   @ApiBearerAuth()
   update(@Param('id') id: string, @Body() updateChatDto: UpdateChatDto, @GetRequestUser('user') user: IToken) {
-    return this.chatService.update(+id, updateChatDto, ComplaintType.CHAT, user);
+    return this.chatService.update(+id, updateChatDto, ComplaintType.CHAT, );
   }
 
   // --------------------- CREATE UPDATE COMMENT -------------------------
