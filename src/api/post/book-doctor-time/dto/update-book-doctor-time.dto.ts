@@ -8,14 +8,14 @@ export class UpdateBookDoctorTimeDto extends PartialType(CreateBookDoctorTimeDto
 
     @ApiProperty({
         example: true,
-        description: 'bu vaht avtivmi yoqmi shuni korsatib beradi (default true)',
+        description: 'aktivmi yoqmi shuni korsatib beradi (default true)',
         required: false,
     })
     isActive?: boolean 
 
     @ApiPropertyOptional({
-        example: [1, 2],
-        description: "Yangilash kerak bo'lsa doktor ID lar ro'yxati",
+        example: [1],
+        description: "Yangilash kerak bolsa doktor ID lar royxati",
     })
     @IsOptional()
     @Type(() => Number)
