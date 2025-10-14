@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsDateString, IsNumber, IsString } from 'class-validator';
+import { IsDateString, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class CreateBookDoctorDto {
   @ApiProperty({
@@ -31,6 +31,9 @@ export class CreateBookDoctorDto {
   @ApiProperty({
     example: "Bosh og'rig'i",
     description: 'Nima uchun murojat qilyatgani',
+    required: false,
   })
+  @IsOptional()
+  @IsString()
   notes?: string | null;
 }
