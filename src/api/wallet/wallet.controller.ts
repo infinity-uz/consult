@@ -16,7 +16,8 @@ import { CurrentUser } from 'src/common/decorator/current-user.decorator';
 export class WalletController {
 	constructor(private readonly walletService: WalletService) { }
 
-	// ------------------------------ Create Wallet ----------------------------->
+//	============================= Create Wallet =============================== //
+
 	@ApiOperation({
 		summary: 'Create Wallet'
 	})
@@ -54,7 +55,7 @@ export class WalletController {
 		return this.walletService.createWallet(createWalletDto, user);
 	}
 
-	// ------------------------------ Get all Wallets ----------------------------->
+	//	============================= Get All Wallets =============================== //
 
 	@ApiOperation({
 		summary: 'get all wallets'
@@ -91,7 +92,7 @@ export class WalletController {
 		return this.walletService.findAllWallet(user);
 	}
 
-	// ------------------------------ get Wallet By ID ----------------------------->
+	//	============================= Get Wallet By Id =============================== //
 
 	@ApiOperation({
 		summary: 'get wallet by id'
@@ -127,7 +128,7 @@ export class WalletController {
 		return this.walletService.findOneWallet(id, user);
 	}
 
-	// ------------------------------ Update Wallet ----------------------------->
+	//	============================= Update Wallet =============================== //
 
 	@ApiOperation({
 		summary: 'Update Wallet'
@@ -166,7 +167,8 @@ export class WalletController {
 		return this.walletService.updateWallet(id, updateWalletDto, user);
 	}
 
-	// ------------------------------ Remove ----------------------------->
+
+	//	============================= Delete Wallet =============================== //
 
 	@ApiBearerAuth()
 	@UseGuards(AuthGuard, RolesGuard)
