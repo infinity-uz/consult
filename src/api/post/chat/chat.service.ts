@@ -2,54 +2,58 @@ import { ConflictException, Injectable, NotFoundException } from '@nestjs/common
 import { CreateChatDto } from './dto/create-chat.dto';
 import { UpdateChatDto } from './dto/update-chat.dto';
 import { PrismaService } from 'src/core/prisma.service';
-import { ComplaintType, Role } from 'generated/prisma';
-import { toUSVString } from 'util';
-import { not } from 'rxjs/internal/util/not';
-import { retry } from 'rxjs';
+import { Chat, ChatRating, ComplaintType, Role } from 'generated/prisma';
+import { IToken } from 'src/infrastructure/token/interface';
+import { BaseService } from 'src/infrastructure/base/base.service';
+import { CreateReviewDto } from './dto/create-review.dto';
+import { UpdateReviewDto } from './dto/update-review.dto';
+
 
 @Injectable()
 export class ChatService {
   constructor(private readonly prisma: PrismaService) { }
-  async create(createChatDto: CreateChatDto, complaintType: ComplaintType) {
-    const { doctorId, pateintsId, fromUserRole, toUserRole, ...rest } = createChatDto;
 
-    const doctor = await this.prisma.doctor.findUnique({ where: { id: doctorId } })
-    if (!doctor) {
-      throw new ConflictException("doctor not found")
-    }
-    const pateints = await this.prisma.pateints.findUnique({ where: { id: pateintsId } })
-    if (!pateints) {
-      throw new ConflictException("pateints not found")
-    }
 
-    let fromUserId: number;
+  // -------------------- CREATE UPDATE CHAT REASON ----------------------------------------------
+
+  async create(createChatDto: CreateChatDto, complaintType: ComplaintType, user: IToken) {
+    const { userId, comments } = createChatDto;
+
+    let fromUserRole: Role;
+    let toUserRole: Role;
     let toUserId: number;
+    let fromUserId: number;
+    let doctorId: number;
+    let pateintsId: number;
 
-
-    if (toUserRole === Role.DOCTOR) {
-      toUserId = doctor.id;
-    } else if (toUserRole === Role.PATEINTS) {
-      toUserId = pateints.id;
+    if (user.role == Role.PATEINTS) {
+      fromUserId = user.id
+      fromUserRole = user.role;
+      pateintsId = user.id;
+      const sherik = await this.prisma.doctor.findUnique({ where: { id: userId } })
+      if (!sherik) throw new NotFoundException("doctor topilmadi")
+      toUserId = sherik.id
+      toUserRole = Role.DOCTOR;
+      doctorId = sherik.id;
     } else {
-      throw new ConflictException("toUserRole notogri");
-    }
-
-
-    if (fromUserRole === Role.DOCTOR) {
-      fromUserId = doctor.id;
-    } else if (fromUserRole === Role.PATEINTS) {
-      fromUserId = pateints.id;
-    } else {
-      throw new ConflictException("fromUserRole notogri");
+      fromUserId = user.id
+      fromUserRole = Role.DOCTOR;
+      doctorId = user.id;
+      const sherik = await this.prisma.pateints.findUnique({ where: { id: userId } })
+      if (!sherik) throw new NotFoundException("pateints topilmadi")
+      toUserId = sherik.id
+      toUserRole = Role.PATEINTS;
+      pateintsId = sherik.id;
     }
 
     const newChat = await this.prisma.chat.create({
       data:
       {
-        ...rest,
-        fromUserId,
-        toUserId, pateintsId,
+        comments,
         doctorId,
+        pateintsId,
+        fromUserId,
+        toUserId,
         fromUserRole,
         toUserRole,
         complaint: complaintType
@@ -58,6 +62,105 @@ export class ChatService {
 
     return newChat;
   }
+
+  async update(id: number, updateChatDto: UpdateChatDto, complaintType: ComplaintType) {
+    await this.findOne(id);
+    return this.prisma.chat.update({ where: { id }, data: { ...updateChatDto, complaint: complaintType } })
+  }
+
+  // --------------------- CREATE UPDATE COMMENT -------------------------
+
+  async createComment(createChatDto: CreateChatDto, complaintType: ComplaintType, user: IToken) {
+    const { userId, comments } = createChatDto;
+
+    let fromUserRole: Role;
+    let toUserRole: Role;
+    let toUserId: number;
+    let fromUserId: number;
+    let doctorId: number;
+    let pateintsId: number;
+
+
+    fromUserId = user.id
+    fromUserRole = Role.PATEINTS;
+    pateintsId = user.id;
+    const sherik = await this.prisma.doctor.findUnique({ where: { id: userId } })
+    if (!sherik) throw new NotFoundException("doctor topilmadi")
+    toUserId = sherik.id
+    toUserRole = Role.DOCTOR;
+    doctorId = sherik.id;
+
+
+    const newComment = await this.prisma.chat.create({
+      data:
+      {
+        comments,
+        doctorId,
+        pateintsId,
+        fromUserId,
+        toUserId,
+        fromUserRole,
+        toUserRole,
+        complaint: complaintType
+      }
+    })
+
+    return newComment;
+  }
+
+  async updateComment(id: number, updateChatDto: UpdateChatDto, complaintType: ComplaintType) {
+    await this.findOne(id);
+    return this.prisma.chat.update({ where: { id }, data: { ...updateChatDto, complaint: complaintType } })
+  }
+
+  // --------------------- CREATE UPDATE REVIEW -------------------------
+
+  async createReview(createChatDto: CreateReviewDto, complaintType: ComplaintType, user: IToken) {
+    const { userId, comments,rating } = createChatDto;
+
+    let fromUserRole: Role;
+    let toUserRole: Role;
+    let toUserId: number;
+    let fromUserId: number;
+    let doctorId: number;
+    let pateintsId: number;
+
+  
+
+    fromUserId = user.id
+    fromUserRole = Role.PATEINTS;
+    pateintsId = user.id;
+    const sherik = await this.prisma.doctor.findUnique({ where: { id: userId } })
+    if (!sherik) throw new NotFoundException("doctor topilmadi")
+    toUserId = sherik.id
+    toUserRole = Role.DOCTOR;
+    doctorId = sherik.id;
+
+
+
+    const newComment = await this.prisma.chat.create({
+      data:
+      {
+        comments,
+        doctorId,
+        pateintsId,
+        fromUserId,
+        toUserId,
+        fromUserRole,
+        toUserRole,
+        complaint: complaintType,
+        rating
+      }
+    })
+
+    return newComment;
+  }
+
+  async updateReview(id: number, updateChatDto: UpdateReviewDto, complaintType: ComplaintType) {
+    await this.findOne(id);
+    return this.prisma.chat.update({ where: { id }, data: { ...updateChatDto, complaint: complaintType } })
+  }
+
 
   findAll() {
     return this.prisma.chat.findMany({ include: { pateints: true, doctor: true } })
@@ -71,10 +174,7 @@ export class ChatService {
     return data;
   }
 
-  async update(id: number, updateChatDto: UpdateChatDto,complaintType:ComplaintType) {
-    await this.findOne(id);
-    return this.prisma.chat.update({where:{id},data:{...updateChatDto,complaint:complaintType}})
-  }
+
 
   async remove(id: number) {
     await this.findOne(id)

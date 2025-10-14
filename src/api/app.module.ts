@@ -9,6 +9,7 @@ import { RedisModule } from 'src/core/redis/redis.module';
 import { AuthModule } from './user/auth/auth.module';
 import { PateintModule } from './user/pateint/pateint.module';
 import { WalletModule } from './post/wallet/wallet.module';
+import { ChatModule } from './post/chat/chat.module';
 import { BookDoctorTimeModule } from './post/book-doctor-time/book-doctor-time.module';
 import { ServiceModule } from './post/service/service.module';
 import { ImageModule } from './post/image/image.module';
@@ -16,6 +17,7 @@ import { DoctorDocumentModule } from './post/doctor-document/doctor-document.mod
 import { BookDoctorModule } from './post/book_doctor/book_doctor.module';
 import { PaymentModule } from './post/payment/payment.module';
 import { SpecialityModule } from './post/speciality/speciality.module';
+
 
 @Module({
   imports: [
